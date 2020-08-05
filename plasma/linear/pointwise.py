@@ -11,7 +11,7 @@ def contrast (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLE
     Apply contrast adjustment to an image.
 
     Parameters:
-        input (Tensor): RGB image with shape (N,3,H,W) in [-1., 1.].
+        input (Tensor): Input RGB image with shape (N,3,H,W) in [-1., 1.].
         weight (float | Tensor): Scalar weight in [-1., 1.].
 
     Returns:
@@ -25,7 +25,7 @@ def exposure (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLE
     Apply exposure adjustment to an image.
 
     Parameters:
-        input (Tensor): RGB image with shape (N,3,H,W) in [-1., 1.].
+        input (Tensor): Input RGB image with shape (N,3,H,W) in [-1., 1.].
         weight (float | Tensor): Scalar weight in [-1., 1.].
 
     Returns:
@@ -51,7 +51,7 @@ def temperature (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOM
     Apply temperature adjustment to an image.
 
     Parameters:
-        input (Tensor): RGB image with shape (N,3,H,W) in [-1., 1.].
+        input (Tensor): Input RGB image with shape (N,3,H,W) in [-1., 1.].
         weight (float | Tensor): Scalar weight in [-1., 1.].
 
     Returns:
@@ -64,7 +64,7 @@ def tint (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLETE
     Apply tint adjustment to an image.
 
     Parameters:
-        input (Tensor): RGB image with shape (N,3,H,W) in [-1., 1.].
+        input (Tensor): Input RGB image with shape (N,3,H,W) in [-1., 1.].
         weight (float | Tensor): Scalar weight in [-1., 1.].
 
     Returns:

@@ -12,12 +12,14 @@ def selective_color (input: Tensor, colors: Tensor, hue_adj: Tensor, sat_adj: Te
     """
     Apply selective color adjustment on a given image.
     All `M` filters are applied simultaneously.
+
     Parameters:
-        input (Tensor): Input image with shape (N,3,H,W) in [-1., 1.]
+        input (Tensor): Input RGB image with shape (N,3,H,W) in [-1., 1.]
         colors (Tensor): Basis RGB colors with shape (M,3) in [0., 1.]
         hue_adj (Tensor): Hue adjustment with shape (N,M,H,W) in [-1., 1.]
         sat_adj (Tensor): Saturation adjustment with shape (N,M,H,W) in [-1., 1.]
         exp_adj (Tensor): Exposure adjustment with shape (N,M,H,W) in [-1., 1.]
+
     Returns:
         Tensor: Result image with shape (N,3,H,W) in [-1., 1.]
     """

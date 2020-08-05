@@ -11,7 +11,7 @@ def rgb_to_yuv (input: Tensor) -> Tensor:
     The shape of the input tensor is preserved.
 
     Parameters:
-        input (Tensor): RGB pixel array with shape (N,3,...) in [-1., 1.].
+        input (Tensor): Input RGB pixel array with shape (N,3,...) in [-1., 1.].
 
     Returns:
         Tensor: YUV pixel array with shape (N,3,...) in [0., 1.]
@@ -33,7 +33,7 @@ def yuv_to_rgb (input: Tensor) -> Tensor:
     The shape of the input tensor is preserved.
 
     Parameters:
-        input (Tensor): YUV pixel array with shape (N,3,...) in [0., 1.].
+        input (Tensor): Input YUV pixel array with shape (N,3,...) in [0., 1.].
 
     Returns:
         Tensor: RGB pixel array with shape (N,3,...) in [-1., 1.]
@@ -54,7 +54,7 @@ def rgb_to_luminance (input: Tensor) -> Tensor:
     Convert an array of RGB pixels to luminance.
 
     Parameters:
-        input (Tensor): RGB pixel array with shape (N,3,...) in [-1., 1.]
+        input (Tensor): Input RGB pixel array with shape (N,3,...) in [-1., 1.]
 
     Returns:
         Tensor: Luminance pixel array with shape (N,1,...) in [-1., 1.]

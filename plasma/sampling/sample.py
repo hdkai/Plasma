@@ -19,6 +19,7 @@ def color_sample_1d (input: Tensor, lut: Tensor): # INCOMPLETE # Artifacts aroun
     """
     # Create volume
     batch,_,_,_ = input.shape
+    lut = lut.to(input.device)
     volume = lut.repeat(batch, 1, 1, 1)
     # Create grid
     colors = input.permute(0, 2, 3, 1)
@@ -43,6 +44,7 @@ def color_sample_3d (input: Tensor, cube: Tensor): # INCOMPLETE # Artifacts arou
     """
     # Create volume
     batch,_,_,_ = input.shape
+    cube = cube.to(input.device)
     volume = cube.repeat(batch, 1, 1, 1, 1).permute(0, 4, 1, 2, 3)
     # Create grid
     grid = input.permute(0, 2, 3, 1).unsqueeze(dim=1)
