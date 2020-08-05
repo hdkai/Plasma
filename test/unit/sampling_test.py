@@ -7,7 +7,7 @@ from PIL import Image
 from pytest import fixture, mark
 from torchvision.transforms import Compose, Normalize, Resize, ToPILImage, ToTensor
 
-from plasma.sampling import color_sample_1d, cuberead, lutread
+from plasma.sampling import color_sample_1d, color_sample_3d, cuberead, lutread
 
 IMAGE_PATHS = [
     "media/filter/1.jpg",
@@ -44,6 +44,9 @@ def test_lut (image_path):
     result = color_sample_1d(image, lut)
     tensorwrite("lut.jpg", result)
 
-def test_load_cube ():
-    #cube = cuberead("media/lut/identity.cube")
-    pass
+@mark.parametrize("image_path", IMAGE_PATHS)
+def test_load_cube (image_path):
+    image = tensorread(image_path)
+    cube = cuberead("media/lut/identity.cube")
+    result = color_sample_3d(image, cube)
+    tensorwrite("cube.jpg", result)

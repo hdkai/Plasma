@@ -55,8 +55,8 @@ def splat_bilateral_grid (input: Tensor, guide: Tensor, grid_size: Tuple[int, in
     samples, _,_,_ = input.shape
     intensity_bins, spatial_bins_y, spatial_bins_x = grid_size
     # Downsample
-    downsampled_input = interpolate(input, size=(spatial_bins_x, spatial_bins_y), mode="bilinear", align_corners=True) # NxCxSxS
-    downsampled_guide = interpolate(guide, size=(spatial_bins_x, spatial_bins_y), mode="bilinear", align_corners=True) # Nx1xSxS
+    downsampled_input = interpolate(input, size=(spatial_bins_x, spatial_bins_y), mode="bilinear", align_corners=False) # NxCxSxS
+    downsampled_guide = interpolate(guide, size=(spatial_bins_x, spatial_bins_y), mode="bilinear", align_corners=False) # Nx1xSxS
     # Create volumes
     input_grid = downsampled_input.unsqueeze(dim=2) # NxCx1xSxS
     volume_padding = (0, 0, 0, 0, 0, intensity_bins - 1, 0, 0)
@@ -69,8 +69,8 @@ def splat_bilateral_grid (input: Tensor, guide: Tensor, grid_size: Tuple[int, in
     wg = wg.repeat(samples, 1, 1, 1).to(input.device)
     sample_grid = stack([wg, hg, ig], dim=4)
     # Sample
-    intensity_grid = grid_sample(input_volume, sample_grid, mode="bilinear", align_corners=True)
-    weight_grid = grid_sample(weight_volume, sample_grid, mode="bilinear", align_corners=True)
+    intensity_grid = grid_sample(input_volume, sample_grid, mode="bilinear", align_corners=False)
+    weight_grid = grid_sample(weight_volume, sample_grid, mode="bilinear", align_corners=False)
     # Return
     return intensity_grid, weight_grid
 
@@ -95,8 +95,8 @@ def slice_bilateral_grid (input: Tensor, guide: Tensor, weight: Optional[Tensor]
     slice_grid = cat([wg, hg, slice_grid], dim=3)           # NxHxWx3
     slice_grid = slice_grid.unsqueeze(dim=1)                # Nx1xHxWx3
     # Sample
-    result = grid_sample(input, slice_grid, mode="bilinear", align_corners=True).squeeze(dim=2)
-    weight = grid_sample(weight, slice_grid, mode="bilinear", align_corners=True).squeeze(dim=2) if weight is not None else ones_like(result)
+    result = grid_sample(input, slice_grid, mode="bilinear", align_corners=False).squeeze(dim=2)
+    weight = grid_sample(weight, slice_grid, mode="bilinear", align_corners=False).squeeze(dim=2) if weight is not None else ones_like(result)
     # Normalize # Prevent divide by zero
     weight = clamp(weight, min=1e-3)
     result = result / weight
