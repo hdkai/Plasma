@@ -7,7 +7,7 @@ from torch import chunk, Tensor
 from torch.nn import Module
 from torch.nn.functional import l1_loss
 
-from ..color import rgb_to_yuv
+from ..conversion import rgb_to_yuv
 
 class ColorOpponentLoss (Module):
     """

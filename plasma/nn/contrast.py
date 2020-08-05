@@ -6,7 +6,7 @@
 from torch import Tensor
 from torch.nn import Module
 
-class ContrastLoss (Module):
+class ContrastLoss (Module): # INCOMPLETE
     """
     Contrast loss, from Mertens et al.
     """

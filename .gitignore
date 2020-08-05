@@ -3,9 +3,17 @@ __pycache__
 .pytest_cache
 
 # IDE
-.vscode
+#.vscode
 .vs
 .idea
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+!media/**/*.jpg
+!media/**/*.jpeg
 
 # Misc
 .DS_Store
