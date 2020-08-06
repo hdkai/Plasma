@@ -6,7 +6,7 @@
 from torch import stack, zeros_like, Tensor
 from torch.nn.functional import grid_sample
 
-def color_sample_1d (input: Tensor, lut: Tensor): # INCOMPLETE # Artifacts around dark areas
+def color_sample_1d (input: Tensor, lut: Tensor) -> Tensor:
     """
     Apply a 1D look-up table to an image.
 
@@ -27,11 +27,11 @@ def color_sample_1d (input: Tensor, lut: Tensor): # INCOMPLETE # Artifacts aroun
     hg = zeros_like(wg)
     grid = stack([wg, hg], dim=3)
     # Sample
-    result = grid_sample(volume, grid, mode="bilinear", align_corners=False)
+    result = grid_sample(volume, grid, mode="bilinear", padding_mode="border", align_corners=False)
     result = result.squeeze(dim=1).view_as(colors).permute(0, 3, 1, 2)
     return result
 
-def color_sample_3d (input: Tensor, cube: Tensor): # INCOMPLETE # Artifacts around dark areas
+def color_sample_3d (input: Tensor, cube: Tensor) -> Tensor:
     """
     Apply a 3D look-up table to an image.
 
@@ -49,6 +49,6 @@ def color_sample_3d (input: Tensor, cube: Tensor): # INCOMPLETE # Artifacts arou
     # Create grid
     grid = input.permute(0, 2, 3, 1).unsqueeze(dim=1)
     # Sample
-    result = grid_sample(volume, grid, mode="bilinear", align_corners=False)
+    result = grid_sample(volume, grid, mode="bilinear", padding_mode="border", align_corners=False)
     result = result.squeeze(dim=2)
     return result

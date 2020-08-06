@@ -9,7 +9,7 @@ from typing import Optional, Tuple
 
 from .gaussian import gaussian_blur_3d
 
-def bilateral_filter_2d (input: Tensor, kernel_size: Tuple[int, int], grid_size: Optional[Tuple[int, int, int]] = None):
+def bilateral_filter_2d (input: Tensor, kernel_size: Tuple[int, int], grid_size: Optional[Tuple[int, int, int]] = None) -> Tensor:
     """
     Apply the bilateral filter to a 2D image.
 

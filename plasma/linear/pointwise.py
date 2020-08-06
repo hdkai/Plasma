@@ -6,7 +6,7 @@
 from torch import clamp, Tensor
 from typing import Union
 
-def contrast (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLETE
+def contrast (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
     """
     Apply contrast adjustment to an image.
 

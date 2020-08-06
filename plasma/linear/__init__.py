@@ -4,4 +4,4 @@
 #
 
 from .pointwise import contrast, exposure, saturation, temperature, tint
-from .spectral import clarity, highlights, shadows
+from .spectral import clarity, highlights, shadows, sharpen
