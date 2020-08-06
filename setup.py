@@ -19,7 +19,9 @@ setup(
     license="Apache License 2.0",
 	python_requires=">=3.6",
     install_requires=[
-        "numpy"
+        "pillow",
+        "torch",
+        "torchvision"
     ],
     url="https://github.com/homedeck/Plasma",
     packages=find_packages(exclude=["examples", "test"]),
