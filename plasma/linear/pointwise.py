@@ -31,7 +31,7 @@ def exposure (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLE
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
     """
-    pass
+    return input
 
 def saturation (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLETE
     """
@@ -44,7 +44,7 @@ def saturation (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMP
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
     """
-    pass
+    return input
 
 def temperature (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLETE
     """
@@ -57,7 +57,7 @@ def temperature (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOM
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
     """
-    pass
+    return input
 
 def tint (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLETE
     """
@@ -70,4 +70,4 @@ def tint (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLETE
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
     """
-    pass
+    return input
