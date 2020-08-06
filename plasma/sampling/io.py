@@ -3,13 +3,14 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
-from PIL import Image
+from imageio import imread
 from torch import float32, tensor, Tensor
 from torchvision.transforms import Compose, Grayscale, Normalize, Resize, ToTensor
 
 def lutread (path: str) -> Tensor:
     """
     Load a 1D LUT from file.
+    The LUT must be encoded as a 16-bit TIFF file.
 
     Parameters:
         path (str): Path to LUT file.
@@ -17,15 +18,14 @@ def lutread (path: str) -> Tensor:
     Returns:
         Tensor: 1D LUT with shape (L,) in [-1., 1.].
     """
-    image = Image.open(path)
-    to_tensor = Compose([
-        Grayscale(),
-        Resize((1, image.width)),
-        ToTensor(),
-        Normalize(mean=[0.5], std=[0.5])
-    ])
-    lut = to_tensor(image)
-    lut = lut.squeeze()
+    # Load
+    image = imread(path) / 65536
+    lut = ToTensor()(image).float()
+    # Slice
+    lut = lut[0] if lut.ndim > 2 else lut
+    lut = lut[lut.shape[0] // 2]
+    # Scale
+    lut = 2. * lut - 1.
     return lut
 
 def cuberead (path: str) -> Tensor:
