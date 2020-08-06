@@ -12,8 +12,8 @@ __pycache__
 *.jpg
 *.jpeg
 *.gif
-!media/**/*.jpg
-!media/**/*.jpeg
+!test/media/**/*.jpg
+!test/media/**/*.jpeg
 
 # Misc
 .DS_Store

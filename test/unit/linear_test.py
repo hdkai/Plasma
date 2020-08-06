@@ -11,10 +11,10 @@ from torchvision.transforms import Compose, Normalize, Resize, ToPILImage, ToTen
 from plasma.linear import clarity, highlights, shadows
 
 IMAGE_PATHS = [
-    "media/1.jpg",
-    "media/2.jpg",
-    "media/3.jpg",
-    "media/4.jpg",
+    "test/media/1.jpg",
+    "test/media/2.jpg",
+    "test/media/3.jpg",
+    "test/media/4.jpg",
 ]
 
 def tensorread (path, size=1024):

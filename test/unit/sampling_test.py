@@ -10,10 +10,10 @@ from torchvision.transforms import Compose, Normalize, Resize, ToPILImage, ToTen
 from plasma.sampling import color_sample_1d, color_sample_3d, cuberead, lutread
 
 IMAGE_PATHS = [
-    "media/filter/1.jpg",
-    "media/filter/2.jpg",
-    "media/filter/3.jpg",
-    "media/filter/4.jpg",
+    "test/media/filter/1.jpg",
+    "test/media/filter/2.jpg",
+    "test/media/filter/3.jpg",
+    "test/media/filter/4.jpg",
 ]
 
 def tensorread (path, size=1024):

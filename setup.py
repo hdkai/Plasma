@@ -24,7 +24,7 @@ setup(
         "torchvision"
     ],
     url="https://github.com/homedeck/Plasma",
-    packages=find_packages(exclude=["examples", "media", "test"]),
+    packages=find_packages(exclude=["examples", "test"]),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
