@@ -22,7 +22,7 @@ import tableprint
 # Parse arguments
 parser = ArgumentParser(description="Train Scene Classifier")
 parser.add_argument("--suya-key", type=str, required=False, default=None, help="Suya access key")
-parser.add_argument("--tags", type="str", nargs="+", help="Image tags")
+parser.add_argument("--tags", type=str, nargs="+", help="Image tags")
 parser.add_argument("--learning-rate", type=float, default=2e-5, help="Nominal learning rate")
 parser.add_argument("--epochs", type=int, default=40, help="Epochs")
 parser.add_argument("--batch-size", type=int, default=16, help="Minibatch size")
