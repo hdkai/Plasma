@@ -10,7 +10,7 @@ with open("README.md", "r") as readme:
 
 setup(
     name="plasma",
-    version="0.0.2",
+    version="0.0.3",
     author="Homedeck, LLC",
     author_email="info@homedeck.io",
     description="The image editing toolkit.",
@@ -26,6 +26,9 @@ setup(
     ],
     url="https://github.com/homedeck/Plasma",
     packages=find_packages(exclude=["examples", "test", "train"]),
+    package_data={
+        "plasma": ["pretrained/*.pt"]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
