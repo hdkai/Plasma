@@ -54,10 +54,17 @@ def shadows (input: Tensor, weight: Union[float, Tensor], tonal_range: float = 1
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
     """
-    luma = rgb_to_luminance(input)
-    mask = -bilateral_filter_2d(luma, kernel_size=(1, 1, 1))
-    shadow_mask = weight * clamp(mask - (1. - tonal_range), min=0.)
-    result = _blend_overlay(input, shadow_mask)
+    # Comute mask
+    luma = -rgb_to_luminance(input)
+    mask = bilateral_filter_2d(luma, kernel_size=(7, 7, 7))
+    mask = mask - (1. - tonal_range)
+    mask = clamp(1.0 * mask, min=0., max=1.)
+    # Blend
+    mask = weight * mask
+    result = _blend_soft_light(input, mask)
+    # Contrast scale
+    contrast = 1. + 0.2 * abs(weight)
+    result = clamp(result * contrast, min=-1., max=1.)
     return result
 
 def sharpen (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLETE
@@ -73,9 +80,26 @@ def sharpen (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLET
     """
     pass
 
-def _blend_overlay (base: Tensor, overlay: Tensor):
-    base, overlay = (base + 1.) / 2., (overlay + 1.) / 2.
+def _blend_overlay (base: Tensor, overlay: Tensor) -> Tensor:
+    # Rescale
+    base = (base + 1.) / 2.
+    overlay = (overlay + 1.) / 2.
+    # Compute sub blending modes
     multiply = 2. * base * overlay
     screen = 1. - 2. * (1. - base) * (1. - overlay)
+    # Blend and rescale
     result = where(base < 0.5, multiply, screen)
-    return result * 2. - 1.
+    result = 2. * result - 1.
+    return result
+
+def _blend_soft_light (base: Tensor, overlay: Tensor) -> Tensor: # Use Photoshop blending
+    # Rescale
+    base = (base + 1.) / 2.
+    overlay =  (overlay + 1.) / 2.
+    # Blend
+    result = (1. - 2. * overlay) * base.pow(2.) + 2. * base * overlay
+    ps_correct = 2 * base * (1. - overlay) + base.sqrt() * (2. * overlay - 1.)
+    result = where(overlay < 0.5, result, ps_correct)
+    # Rescale
+    result = 2. * result - 1.
+    return result

@@ -22,7 +22,7 @@ def tensorwrite (name, *images):
         Normalize(mean=channels * [-1.], std=channels * [2.]),
         ToPILImage()
     ])
-    images = [to_image(image.squeeze()) for image in images]
+    images = [to_image(image.squeeze(dim=0)) for image in images]
     if len(images) > 1:
         images[0].save(name, save_all=True, append_images=images[1:], duration=100, loop=0)
     else:
