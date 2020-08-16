@@ -3,21 +3,10 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
-from PIL import Image
 from pytest import fixture, mark
-from torchvision.transforms import Compose, Normalize, Resize, ToPILImage, ToTensor
+from .common import tensorread
 
 from plasma.structure import image_scene, ImageScene
-
-def tensorread (path, size=1024):
-    to_tensor = Compose([
-        Resize(size),
-        ToTensor(),
-        Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-    ])
-    image = Image.open(path)
-    image = to_tensor(image).unsqueeze(dim=0)
-    return image
 
 @mark.parametrize("image_path,type", [
     ("test/media/scene/interior.jpg", ImageScene.Interior),
