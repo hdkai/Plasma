@@ -15,6 +15,7 @@ IMAGE_PATHS = [
     "test/media/filter/3.jpg",
     "test/media/filter/4.jpg",
     "test/media/filter/5.jpg",
+    "test/media/filter/6.jpg"
 ]
 
 @mark.parametrize("image_path", IMAGE_PATHS)
@@ -54,13 +55,20 @@ def test_shadows (image_path):
     tensorwrite("shadows.gif", *results)
 
 @mark.parametrize("image_path", IMAGE_PATHS)
+def test_shadows_highlights (image_path):
+    image = tensorread(image_path, size=2048)
+    result = shadows(image, 1.)
+    result = highlights(result, -1.)
+    tensorwrite("shadhi.jpg", result)
+
+@mark.parametrize("image_path", IMAGE_PATHS)
 def test_sharpen (image_path):
     image = tensorread(image_path)
     results = [sharpen(image, weight) for weight in linspace(-1., 1., 20)]
     tensorwrite("sharpen.gif", *results)
 
 @mark.parametrize("image_path", IMAGE_PATHS)
-def test_temsperature (image_path):
+def test_temperature (image_path):
     image = tensorread(image_path)
     results = [temperature(image, weight) for weight in linspace(-1., 1., 20)]
     tensorwrite("temperature.gif", *results)

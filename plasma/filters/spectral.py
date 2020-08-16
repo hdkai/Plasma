@@ -37,10 +37,14 @@ def highlights (input: Tensor, weight: Union[float, Tensor], tonal_range: float 
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
     """
-    luma = rgb_to_luminance(input)
-    mask = -bilateral_filter_2d(luma, kernel_size=(5, 5, 11))
-    highlight_mask = -weight * clamp(mask + (1. - tonal_range), max=0.)
-    result = _blend_overlay(input, highlight_mask)
+    # Compute mask
+    luma = -rgb_to_luminance(input)
+    mask = bilateral_filter_2d(luma, kernel_size=(7, 7, 7))
+    mask = mask + (1. - tonal_range)
+    mask = clamp(mask, min=-1., max=0.)
+    # Blend
+    mask = -weight * mask
+    result = _blend_overlay(input, mask)
     return result
 
 def shadows (input: Tensor, weight: Union[float, Tensor], tonal_range: float = 1.) -> Tensor:
@@ -54,11 +58,11 @@ def shadows (input: Tensor, weight: Union[float, Tensor], tonal_range: float = 1
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
     """
-    # Comute mask
+    # Compute mask
     luma = -rgb_to_luminance(input)
     mask = bilateral_filter_2d(luma, kernel_size=(7, 7, 7))
     mask = mask - (1. - tonal_range)
-    mask = clamp(1.0 * mask, min=0., max=1.)
+    mask = clamp(mask, min=0., max=1.)
     # Blend
     mask = weight * mask
     result = _blend_soft_light(input, mask)
