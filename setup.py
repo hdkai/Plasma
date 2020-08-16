@@ -27,7 +27,7 @@ setup(
     url="https://github.com/homedeck/Plasma",
     packages=find_packages(exclude=["examples", "test", "train"]),
     package_data={
-        "plasma": ["*.pt"]
+        "plasma.structure": ["*.pt"]
     },
     classifiers=[
         "Programming Language :: Python :: 3",
