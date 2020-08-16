@@ -33,7 +33,7 @@ def image_scene (input: Tensor) -> ImageScene:
     """
     global _scene_classifier
     if _scene_classifier is None:
-        model_path = resource_filename("plasma.pretrained", "scene_classifier.pt")
+        model_path = resource_filename("plasma.structure", "scene.pt")
         _scene_classifier = load(model_path)
     _scene_classifier = _scene_classifier.to(input.device)
     input = interpolate(input, (512, 512), mode="bilinear")
