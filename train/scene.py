@@ -50,6 +50,7 @@ model.classifier = Sequential(
     Dropout(0.2),
     Linear(model.last_channel, len(args.tags))
 )
+model = model.to(device)
 
 # Create optimizer and loss
 cross_entropy_loss = CrossEntropyLoss().to(device)
@@ -100,7 +101,7 @@ with SummaryWriter() as summary_writer:
         # Save model
         model = model.cpu()
         scripted_model = script(model)
-        save(scripted_model, "scene_classifier.pt")
+        save(scripted_model, "scene.pt")
         model = model.to(device)
     
     # Print
