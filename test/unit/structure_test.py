@@ -9,8 +9,12 @@ from .common import tensorread
 from plasma.structure import image_scene, ImageScene
 
 @mark.parametrize("image_path,type", [
-    ("test/media/scene/interior.jpg", ImageScene.Interior),
-    ("test/media/scene/exterior.jpg", ImageScene.Exterior)
+    ("test/media/filter/1.jpg", ImageScene.Interior),
+    ("test/media/filter/2.jpg", ImageScene.Exterior),
+    ("test/media/filter/3.jpg", ImageScene.Interior),
+    ("test/media/filter/4.jpg", ImageScene.Exterior),
+    ("test/media/filter/5.jpg", ImageScene.Exterior),
+    ("test/media/filter/6.jpg", ImageScene.Exterior),
 ])
 def test_scene (image_path, type):
     image = tensorread(image_path)

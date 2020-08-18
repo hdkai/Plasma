@@ -10,8 +10,8 @@ from suya.torch import LabeledDataset
 from torch import device as get_device
 from torch.cuda import is_available as cuda_available
 from torch.jit import save, script
-from torch.nn import CrossEntropyLoss
-from torch.optim import Adam
+from torch.nn import CrossEntropyLoss, Dropout, Linear, Sequential
+from torch.optim import SGD
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.models import mobilenet_v2
@@ -38,16 +38,21 @@ transform = Compose([
     ToTensor(),
     Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 ])
-dataset = LabeledDataset(*args.tags, size=130, transform=transform)
-dataloader = DataLoader(dataset, batch_size=8, num_workers=4, pin_memory=True, drop_last=True)
+dataset = LabeledDataset(*args.tags, size=2000, transform=transform)
+dataloader = DataLoader(dataset, batch_size=8, num_workers=4, pin_memory=True, drop_last=True, shuffle=True)
 
 # Create model
 device = get_device("cuda:0") if cuda_available() else get_device("cpu")
-model = mobilenet_v2(pretrained=False, num_classes=len(args.tags)).to(device)
+model = mobilenet_v2(pretrained=True)
+model.classifier = Sequential(
+    Dropout(0.2),
+    Linear(model.last_channel, len(args.tags))
+)
+model = model.to(device)
 
 # Create optimizer and loss
 cross_entropy_loss = CrossEntropyLoss().to(device)
-optimizer = Adam(model.parameters(), lr=args.learning_rate, betas=(0.5, 0.999))
+optimizer = SGD(model.parameters(), lr=args.learning_rate, momentum=0.9)
 
 # Print
 print("Preparing for training:")
@@ -94,7 +99,7 @@ with SummaryWriter() as summary_writer:
         # Save model
         model = model.cpu()
         scripted_model = script(model)
-        save(scripted_model, "scene_classifier.pt")
+        save(scripted_model, "scene.pt")
         model = model.to(device)
     
     # Print

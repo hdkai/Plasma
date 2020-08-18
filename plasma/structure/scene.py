@@ -19,7 +19,6 @@ class ImageScene (IntEnum):
     Interior = 0
     Exterior = 1
     Twilight = 2
-    Aerial = 3
 
 def image_scene (input: Tensor) -> ImageScene:
     """
@@ -35,6 +34,7 @@ def image_scene (input: Tensor) -> ImageScene:
     if _scene_classifier is None:
         model_path = resource_filename("plasma.structure", "scene.pt")
         _scene_classifier = load(model_path)
+        _scene_classifier.eval()
     _scene_classifier = _scene_classifier.to(input.device)
     input = interpolate(input, (512, 512), mode="bilinear")
     with no_grad():
