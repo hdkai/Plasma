@@ -10,7 +10,7 @@ from suya.torch import LabeledDataset
 from torch import device as get_device
 from torch.cuda import is_available as cuda_available
 from torch.jit import save, script
-from torch.nn import CrossEntropyLoss
+from torch.nn import CrossEntropyLoss, Dropout, Linear, Sequential
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
@@ -43,7 +43,13 @@ dataloader = DataLoader(dataset, batch_size=8, num_workers=4, pin_memory=True, d
 
 # Create model
 device = get_device("cuda:0") if cuda_available() else get_device("cpu")
-model = mobilenet_v2(pretrained=False, num_classes=len(args.tags)).to(device)
+model = mobilenet_v2(pretrained=True)
+for param in model.parameters():
+    param.requires_grad = False
+model.classifier = Sequential(
+    Dropout(0.2),
+    Linear(model.last_channel, len(args.tags))
+)
 
 # Create optimizer and loss
 cross_entropy_loss = CrossEntropyLoss().to(device)
