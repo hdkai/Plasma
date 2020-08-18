@@ -39,13 +39,13 @@ transform = Compose([
     Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 ])
 dataset = LabeledDataset(*args.tags, size=2000, transform=transform)
-dataloader = DataLoader(dataset, batch_size=8, num_workers=4, pin_memory=True, drop_last=True)
+dataloader = DataLoader(dataset, batch_size=8, num_workers=4, pin_memory=True, drop_last=True, shuffle=True)
 
 # Create model
 device = get_device("cuda:0") if cuda_available() else get_device("cpu")
 model = mobilenet_v2(pretrained=True)
-for param in model.parameters():
-    param.requires_grad = False
+# for param in model.parameters():
+#     param.requires_grad = False
 model.classifier = Sequential(
     Dropout(0.2),
     Linear(model.last_channel, len(args.tags))
