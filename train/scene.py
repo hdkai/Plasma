@@ -11,7 +11,7 @@ from torch import device as get_device
 from torch.cuda import is_available as cuda_available
 from torch.jit import save, script
 from torch.nn import CrossEntropyLoss, Dropout, Linear, Sequential
-from torch.optim import Adam
+from torch.optim import SGD
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.models import mobilenet_v2
@@ -52,7 +52,7 @@ model = model.to(device)
 
 # Create optimizer and loss
 cross_entropy_loss = CrossEntropyLoss().to(device)
-optimizer = Adam(model.parameters(), lr=args.learning_rate, betas=(0.5, 0.999))
+optimizer = SGD(model.parameters(), lr=args.learning_rate, momentum=0.9)
 
 # Print
 print("Preparing for training:")
