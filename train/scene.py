@@ -44,8 +44,6 @@ dataloader = DataLoader(dataset, batch_size=8, num_workers=4, pin_memory=True, d
 # Create model
 device = get_device("cuda:0") if cuda_available() else get_device("cpu")
 model = mobilenet_v2(pretrained=True)
-# for param in model.parameters():
-#     param.requires_grad = False
 model.classifier = Sequential(
     Dropout(0.2),
     Linear(model.last_channel, len(args.tags))
