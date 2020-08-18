@@ -38,7 +38,7 @@ transform = Compose([
     ToTensor(),
     Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 ])
-dataset = LabeledDataset(*args.tags, size=130, transform=transform)
+dataset = LabeledDataset(*args.tags, size=2000, transform=transform)
 dataloader = DataLoader(dataset, batch_size=8, num_workers=4, pin_memory=True, drop_last=True)
 
 # Create model
