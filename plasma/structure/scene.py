@@ -36,7 +36,7 @@ def image_scene (input: Tensor) -> ImageScene:
         _scene_classifier = load(model_path)
         _scene_classifier.eval()
     _scene_classifier = _scene_classifier.to(input.device)
-    input = interpolate(input, (512, 512), mode="bilinear")
+    input = interpolate(input, (512, 512), mode="bilinear", align_corners=False)
     with no_grad():
         logits = _scene_classifier(input)
     result = logits.argmax().item()
