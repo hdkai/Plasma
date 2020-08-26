@@ -7,7 +7,7 @@ from torch import clamp, lerp, where, Tensor
 from typing import Union
 
 from ..conversion import rgb_to_luminance
-from ..sampling import bilateral_filter_2d
+from ..sampling import bilateral_filter_2d, gaussian_blur_2d
 
 def clarity (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
     """
@@ -71,7 +71,7 @@ def shadows (input: Tensor, weight: Union[float, Tensor], tonal_range: float = 1
     result = clamp(result * contrast, min=-1., max=1.)
     return result
 
-def sharpen (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLETE
+def sharpen (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
     """
     Apply sharpness enhancement to an image.
 
@@ -82,7 +82,10 @@ def sharpen (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLET
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
     """
-    pass
+    base_layer = gaussian_blur_2d(input, (5, 5))
+    result = lerp(base_layer, input, 1. + weight)
+    result = clamp(result, min=-1., max=1.)
+    return result
 
 def _blend_overlay (base: Tensor, overlay: Tensor) -> Tensor:
     # Rescale

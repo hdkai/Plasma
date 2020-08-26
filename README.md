@@ -1,2 +1,2 @@
 # Plasma
-The image editing toolkit built with PyTorch.
+Differentiable image editing framework for PyTorch.

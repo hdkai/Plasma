@@ -15,6 +15,7 @@ from plasma.structure import image_scene, ImageScene
     ("test/media/filter/4.jpg", ImageScene.Exterior),
     ("test/media/filter/5.jpg", ImageScene.Exterior),
     ("test/media/filter/6.jpg", ImageScene.Exterior),
+    ("test/media/scene/1.jpg", ImageScene.Exterior),
 ])
 def test_scene (image_path, type):
     image = tensorread(image_path)

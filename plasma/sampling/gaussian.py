@@ -42,7 +42,7 @@ def gaussian_blur_2d (input: Tensor, kernel_size: Tuple[int, int]) -> Tensor:
     kernel_size_y, kernel_size_x = kernel_size
     kernel_x = gaussian_kernel_1d(kernel_size_x).expand(channels, 1, 1, -1).to(input.device)
     kernel_y = gaussian_kernel_1d(kernel_size_x).expand(channels, 1, 1, -1).permute(0, 1, 3, 2).to(input.device)
-    # Convolve
+    # Seperable convolution
     result = conv2d(input, kernel_x, padding=(0, kernel_size_x // 2), groups=channels)
     result = conv2d(result, kernel_y, padding=(kernel_size_y // 2, 0), groups=channels)
     return result
@@ -65,7 +65,7 @@ def gaussian_blur_3d (input: Tensor, kernel_size: Tuple[int, int, int]) -> Tenso
     kernel_x = gaussian_kernel_1d(kernel_size_x).expand(channels, 1, 1, 1, -1).to(input.device)
     kernel_y = gaussian_kernel_1d(kernel_size_y).expand(channels, 1, 1, 1, -1).permute(0, 1, 2, 4, 3).to(input.device)
     kernel_z = gaussian_kernel_1d(kernel_size_z).expand(channels, 1, 1, 1, -1).permute(0, 1, 4, 2, 3).to(input.device)
-    # Convolve
+    # Seperable convolution
     result = conv3d(input, kernel_x, padding=(0, 0, kernel_size_x // 2), groups=channels)
     result = conv3d(result, kernel_y, padding=(0, kernel_size_y // 2, 0), groups=channels)
     result = conv3d(result, kernel_z, padding=(kernel_size_z // 2, 0, 0), groups=channels)

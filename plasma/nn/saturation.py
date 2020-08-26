@@ -3,10 +3,12 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
-from torch import Tensor
+from torch import clamp, norm, Tensor
 from torch.nn import Module
 
-class SaturationLoss (Module): # INCOMPLETE
+from ..conversion import rgb_to_yuv
+
+class SaturationLoss (Module):
     """
     Saturation loss.
     """
@@ -15,4 +17,10 @@ class SaturationLoss (Module): # INCOMPLETE
         super(SaturationLoss, self).__init__()
 
     def forward (self, input: Tensor, target: Tensor):
-        pass
+        input_uv = rgb_to_yuv(input)[:,1:,:,:]
+        target_uv = rgb_to_yuv(target)[:,1:,:,:]
+        input_sat = norm(input_uv, dim=1)
+        target_sat = norm(target_uv, dim=1)
+        delta = clamp(target_sat - input_sat, min=0.)
+        loss = delta.sum() / delta.nelement()
+        return loss

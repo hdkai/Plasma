@@ -3,8 +3,10 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
-from torch import clamp, Tensor
+from torch import cat, clamp, Tensor
 from typing import Union
+
+from ..conversion import rgb_to_yuv, yuv_to_rgb
 
 def contrast (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
     """
@@ -33,7 +35,7 @@ def exposure (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLE
     """
     return input
 
-def saturation (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLETE
+def saturation (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # TEST
     """
     Apply saturation adjustment to an image.
 
@@ -44,7 +46,13 @@ def saturation (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMP
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
     """
-    return input
+    yuv = rgb_to_yuv(input)
+    y, u, v = yuv.split(1, dim=1)
+    u *= (weight + 1.)
+    u *= (weight + 1.)
+    yuv = cat([y, u, v], dim=1)
+    result = yuv_to_rgb(yuv)
+    return result
 
 def temperature (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLETE
     """
