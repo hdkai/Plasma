@@ -15,19 +15,18 @@ def bilateral_filter_2d (input: Tensor, kernel_size: Tuple[int, int], grid_size:
     Apply the bilateral filter to a 2D image.
 
     Parameters:
-        input (Tensor): Input image with shape (N,C,H,W).
+        input (Tensor): Input image with shape (N,C,H,W). Channel count `C` MUST be 1 or 3.
         kernel_size (tuple): Kernel size in intensity and spatial dimensions (Ki,Ks).
         grid_size (tuple): Bilateral grid size. If `None`, a suitable default will be used.
 
     Returns:
         Tensor: Filtered image with shape (N,C,H,W).
     """
-    _,channels,_,_ = input.shape
     kernel_size = (kernel_size[0], kernel_size[1], kernel_size[1])
     grid_size = grid_size if grid_size is not None else (16, 512, 512)
     # Filter each channel independently
     channels = input.split(1, dim=1)
-    luminance = rgb_to_luminance(input)
+    luminance = rgb_to_luminance(input) if input.shape[1] == 3 else input
     filtered_channels = []
     for channel in channels:
         # Construct grid
