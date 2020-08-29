@@ -7,6 +7,7 @@ from torch import cat, clamp, linspace, meshgrid, ones_like, stack, Tensor
 from torch.nn.functional import grid_sample, interpolate, pad
 from typing import Optional, Tuple
 
+from ..conversion import rgb_to_luminance
 from .gaussian import gaussian_blur_3d
 
 def bilateral_filter_2d (input: Tensor, kernel_size: Tuple[int, int], grid_size: Optional[Tuple[int, int, int]] = None) -> Tensor:
@@ -23,18 +24,19 @@ def bilateral_filter_2d (input: Tensor, kernel_size: Tuple[int, int], grid_size:
     """
     _,channels,_,_ = input.shape
     kernel_size = (kernel_size[0], kernel_size[1], kernel_size[1])
-    grid_size = grid_size if grid_size is not None else (16, 64, 64)
+    grid_size = grid_size if grid_size is not None else (16, 512, 512)
     # Filter each channel independently
     channels = input.split(1, dim=1)
+    luminance = rgb_to_luminance(input)
     filtered_channels = []
     for channel in channels:
         # Construct grid
-        intensity_grid, weight_grid = splat_bilateral_grid(channel, channel, grid_size)
+        intensity_grid, weight_grid = splat_bilateral_grid(channel, luminance, grid_size)
         # Filter
         intensity_grid = gaussian_blur_3d(intensity_grid, kernel_size)
         weight_grid = gaussian_blur_3d(weight_grid, kernel_size)
         # Slice
-        filtered_channel = slice_bilateral_grid(intensity_grid, channel, weight_grid)
+        filtered_channel = slice_bilateral_grid(intensity_grid, luminance, weight_grid)
         filtered_channels.append(filtered_channel)
     # Stack
     result = cat(filtered_channels, dim=1)
@@ -69,8 +71,8 @@ def splat_bilateral_grid (input: Tensor, guide: Tensor, grid_size: Tuple[int, in
     wg = wg.repeat(samples, 1, 1, 1).to(input.device)
     sample_grid = stack([wg, hg, ig], dim=4)
     # Sample
-    intensity_grid = grid_sample(input_volume, sample_grid, mode="bilinear", align_corners=False)
-    weight_grid = grid_sample(weight_volume, sample_grid, mode="bilinear", align_corners=False)
+    intensity_grid = grid_sample(input_volume, sample_grid, mode="bilinear", padding_mode="reflection", align_corners=False)
+    weight_grid = grid_sample(weight_volume, sample_grid, mode="bilinear", padding_mode="reflection", align_corners=False)
     # Return
     return intensity_grid, weight_grid
 
@@ -95,8 +97,8 @@ def slice_bilateral_grid (input: Tensor, guide: Tensor, weight: Optional[Tensor]
     slice_grid = cat([wg, hg, slice_grid], dim=3)           # NxHxWx3
     slice_grid = slice_grid.unsqueeze(dim=1)                # Nx1xHxWx3
     # Sample
-    result = grid_sample(input, slice_grid, mode="bilinear", align_corners=False).squeeze(dim=2)
-    weight = grid_sample(weight, slice_grid, mode="bilinear", align_corners=False).squeeze(dim=2) if weight is not None else ones_like(result)
+    result = grid_sample(input, slice_grid, mode="bilinear", padding_mode="reflection", align_corners=False).squeeze(dim=2)
+    weight = grid_sample(weight, slice_grid, mode="bilinear", padding_mode="reflection", align_corners=False).squeeze(dim=2) if weight is not None else ones_like(result)
     # Normalize # Prevent divide by zero
     weight = clamp(weight, min=1e-3)
     result = result / weight

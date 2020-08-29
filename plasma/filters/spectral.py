@@ -20,7 +20,7 @@ def clarity (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
     """
-    base_layer = bilateral_filter_2d(input, kernel_size=(5, 5, 11))
+    base_layer = bilateral_filter_2d(input, kernel_size=(5, 11), grid_size=(16, 512, 512))
     base_layer = clamp((base_layer + 1.) * 1.1 - 1., max=1.) # Brighten to mimic LR
     result = lerp(base_layer, input, 1. + weight)
     result = clamp(result, min=-1., max=1.)
