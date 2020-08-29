@@ -7,11 +7,13 @@ from PIL import Image
 from torchvision.transforms import Compose, Normalize, Resize, ToPILImage, ToTensor
 
 def tensorread (path, size=1024):
-    to_tensor = Compose([
-        Resize(size),
+    transforms = [
         ToTensor(),
         Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-    ])
+    ]
+    if size is not None:
+        transforms.insert(0, Resize(size))
+    to_tensor = Compose(transforms)
     image = Image.open(path)
     image = to_tensor(image).unsqueeze(dim=0)
     return image

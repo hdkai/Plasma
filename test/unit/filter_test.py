@@ -15,7 +15,8 @@ IMAGE_PATHS = [
     "test/media/filter/3.jpg",
     "test/media/filter/4.jpg",
     "test/media/filter/5.jpg",
-    "test/media/filter/6.jpg"
+    "test/media/filter/6.jpg",
+    "test/media/filter/7.jpg",
 ]
 
 @mark.parametrize("image_path", IMAGE_PATHS)
