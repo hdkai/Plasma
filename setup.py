@@ -10,7 +10,7 @@ with open("README.md", "r") as readme:
 
 setup(
     name="plasma",
-    version="0.0.8",
+    version="0.0.9",
     author="Homedeck, LLC",
     author_email="info@homedeck.io",
     description="The image editing toolkit.",

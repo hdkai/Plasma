@@ -39,7 +39,7 @@ def highlights (input: Tensor, weight: Union[float, Tensor], tonal_range: float 
     """
     # Compute mask
     luma = -rgb_to_luminance(input)
-    mask = bilateral_filter_2d(luma, kernel_size=(7, 7, 7))
+    mask = bilateral_filter_2d(luma, kernel_size=(5, 11), grid_size=(16, 64, 64))
     mask = mask + (1. - tonal_range)
     mask = clamp(mask, min=-1., max=0.)
     # Blend
@@ -60,7 +60,7 @@ def shadows (input: Tensor, weight: Union[float, Tensor], tonal_range: float = 1
     """
     # Compute mask
     luma = -rgb_to_luminance(input)
-    mask = bilateral_filter_2d(luma, kernel_size=(7, 7, 7))
+    mask = bilateral_filter_2d(luma, kernel_size=(5, 11), grid_size=(16, 64, 64))
     mask = mask - (1. - tonal_range)
     mask = clamp(mask, min=0., max=1.)
     # Blend
