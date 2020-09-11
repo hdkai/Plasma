@@ -38,7 +38,7 @@ def selective_color (input: Tensor, colors: Tensor, hue_adj: Tensor, sat_adj: Te
     rotation = rotations[0]
     for i in range(1, len(weights)):
         rotation = rotations[i].matmul(rotation)
-    rotated_uv = rotation.matmul(colors).squeeze(dim=4).permute(0, 3, 1, 2)
+    rotated_uv = rotation.matmul(colors).squeeze(dim=4).permute(0, 3, 1, 2).contiguous()
     # Adjust saturation
     sats = sat_adj.split(1, dim=1)
     sats = [weight * sat for weight, sat in zip(weights, sats)]
