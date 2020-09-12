@@ -19,8 +19,11 @@ setup(
     license="Apache License 2.0",
 	python_requires=">=3.6",
     install_requires=[
+        "exifread",
+        "lensfunpy",
         "imageio",
         "pillow",
+        "rawpy",
         "torch",
         "torchvision"
     ],

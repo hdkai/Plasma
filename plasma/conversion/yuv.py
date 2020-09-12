@@ -46,7 +46,8 @@ def yuv_to_rgb (input: Tensor) -> Tensor:
     yuv_colors = input.flatten(start_dim=2)
     rgb_colors = YUV_TO_RGB.matmul(yuv_colors)
     rgb = rgb_colors.view_as(input)
-    rgb = (2.0 * rgb - 1.0).clamp(min=-1., max=1.)
+    rgb = 2.0 * rgb - 1.0
+    rgb = rgb.clamp(min=-1., max=1.)
     return rgb
 
 def rgb_to_luminance (input: Tensor) -> Tensor:

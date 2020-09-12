@@ -8,7 +8,7 @@ from typing import Union
 
 from ..conversion import rgb_to_yuv, yuv_to_rgb
 
-def contrast (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
+def contrast (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # TEST
     """
     Apply contrast adjustment to an image.
 
@@ -19,10 +19,11 @@ def contrast (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
     """
-    result = clamp(input * weight, -1., 1.)
+    result = input * weight
+    result = result.clamp(min=-1., max=1.)
     return result
 
-def exposure (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLETE
+def exposure (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # TEST
     """
     Apply exposure adjustment to an image.
 
@@ -33,7 +34,11 @@ def exposure (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # INCOMPLE
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
     """
-    return input
+    input = (input + 1.) / 2.
+    result = input * weight
+    result = 2. * result - 1.
+    result = result.clamp(min=-1., max=1.)
+    return result
 
 def saturation (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # TEST
     """
@@ -48,8 +53,8 @@ def saturation (input: Tensor, weight: Union[float, Tensor]) -> Tensor: # TEST
     """
     yuv = rgb_to_yuv(input)
     y, u, v = yuv.split(1, dim=1)
-    u *= (weight + 1.)
-    u *= (weight + 1.)
+    u = u * (1. + weight)
+    v = v * (1. + weight)
     yuv = cat([y, u, v], dim=1)
     result = yuv_to_rgb(yuv)
     return result
