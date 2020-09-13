@@ -3,6 +3,7 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
+from pathlib import Path
 from PIL import Image
 from pkg_resources import resource_filename
 from rawpy import imread, DemosaicAlgorithm, HighlightMode, Params
@@ -33,13 +34,14 @@ def rawread (*image_paths: str) -> Image.Image:
     exposures, metadatas = [], []
     for image_path in image_paths:
         with imread(image_path) as raw:
-            # Demosaic
+            # Repair bad pixels
             repair_bad_pixels(raw, bad_pixels, method="median")
+            # Demosaic
             params = Params(
                 demosaic_algorithm=DemosaicAlgorithm.AHD,
                 use_camera_wb=True,
                 no_auto_bright=True,
-                user_sat=9000,
+                user_sat=11000,
                 output_bps=8,
                 highlight_mode=HighlightMode.Clip,
                 gamma=(1, 1)
@@ -50,11 +52,14 @@ def rawread (*image_paths: str) -> Image.Image:
             # Load metadata
             metadata = exifread(image_path)
             metadatas.append(metadata)
-    # Apply gamma correction and tone curve
+    # Gamma correction
     device = get_io_device()
-    exposures = [ToPILImage()(exposure) for exposure in exposures]
+    exposures = [ToTensor()(exposure) for exposure in exposures]
     exposure_stack = stack(exposures, dim=0).to(device)
     exposure_stack = 2. * exposure_stack.pow(1. / 2.2) - 1.
+    # Chromaticity noise reduction # INCOMPLETE
+
+    # Tone curve
     tone_curve_path = resource_filename("plasma.io", "data/raw_standard_med.tif")
     tone_curve = lutread(tone_curve_path)
     exposure_stack = color_sample_1d(exposure_stack, tone_curve)
@@ -65,7 +70,7 @@ def rawread (*image_paths: str) -> Image.Image:
     exposures = [ToPILImage()(exposure.squeeze(dim=0)) for exposure in exposures]
     # Add EXIF metadata
     exposures = [exifwrite(exposure, metadata) for exposure, metadata in zip(exposures, metadatas)]
-    return exposures
+    return exposures if len(exposures) > 1 else exposures[0]
 
 def is_raw_format (image_path: str) -> bool:
     """

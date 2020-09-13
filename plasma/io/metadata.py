@@ -43,5 +43,5 @@ def exifwrite (image: Image.Image, metadata: dict) -> Image.Image:
         image (PIL.Image): Image to write metadata to.
         metadata (dict): Metadata dictionary.
     """
-    image.info["exif"] = dump_exif(exif)
+    image.info["exif"] = dump_exif(metadata)
     return image
