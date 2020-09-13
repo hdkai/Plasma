@@ -10,7 +10,7 @@ with open("README.md", "r") as readme:
 
 setup(
     name="plasma",
-    version="0.0.9",
+    version="0.0.10",
     author="Homedeck, LLC",
     author_email="info@homedeck.io",
     description="The image editing toolkit.",
@@ -19,14 +19,20 @@ setup(
     license="Apache License 2.0",
 	python_requires=">=3.6",
     install_requires=[
+        "exifread",
+        "lensfunpy",
         "imageio",
+        "opencv-python",
+        "piexif",
         "pillow",
+        "rawpy",
         "torch",
         "torchvision"
     ],
     url="https://github.com/homedeck/Plasma",
-    packages=find_packages(exclude=["examples", "test", "train"]),
+    packages=find_packages(exclude=["examples", "playground", "test", "train"]),
     package_data={
+        "plasma.io": ["data/*.tif"],
         "plasma.structure": ["*.pt"]
     },
     classifiers=[
