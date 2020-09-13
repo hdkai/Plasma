@@ -25,7 +25,7 @@ def lens_correction (*images: Image.Image) -> Image.Image:
     """
     # Check
     if len(images) == 0:
-        return []
+        return None
     # Compute sample grid
     grid = _compute_sample_grid(images[0])
     if grid is None:

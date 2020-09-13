@@ -22,14 +22,16 @@ setup(
         "exifread",
         "lensfunpy",
         "imageio",
+        "piexif",
         "pillow",
         "rawpy",
         "torch",
         "torchvision"
     ],
     url="https://github.com/homedeck/Plasma",
-    packages=find_packages(exclude=["examples", "test", "train"]),
+    packages=find_packages(exclude=["examples", "playground", "test", "train"]),
     package_data={
+        "plasma.io": ["data/*.tif"],
         "plasma.structure": ["*.pt"]
     },
     classifiers=[
