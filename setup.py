@@ -22,6 +22,7 @@ setup(
         "exifread",
         "lensfunpy",
         "imageio",
+        "opencv-python",
         "piexif",
         "pillow",
         "rawpy",

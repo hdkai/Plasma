@@ -3,6 +3,7 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
+from .blending import exposure_fusion, hdr_tonemapping
 from .device import set_io_device
 from .group import group_exposures
 from .lens import lens_correction
