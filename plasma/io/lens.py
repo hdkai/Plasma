@@ -53,8 +53,10 @@ def _compute_sample_grid (image: Image.Image) -> ndarray:
     """
     Create a modifier for the camera and lens used to capture a given image.
     This function relies on the image's EXIF metadata to function.
+
     Parameters:
         image (PIL.Image): Input image.
+        
     Returns:
         Modifier: Modifier for the camera and lens, or `None` if there is insufficient metadata.
     """
