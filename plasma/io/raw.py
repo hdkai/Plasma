@@ -9,12 +9,13 @@ from PIL import Image
 from pkg_resources import resource_filename
 from rawpy import imread, DemosaicAlgorithm, HighlightMode, Params
 from rawpy.enhance import find_bad_pixels, repair_bad_pixels
-from torch import stack
+from torch import cat, stack
 from torchvision.transforms import ToTensor, ToPILImage
 
 from .device import get_io_device
 from .metadata import exifread, exifwrite
-from ..sampling import color_sample_1d, lutread
+from ..conversion import rgb_to_yuv, yuv_to_rgb
+from ..sampling import bilateral_filter_2d, color_sample_1d, lutread
 
 def rawread (*image_paths: str) -> Image.Image:
     """
@@ -61,8 +62,13 @@ def rawread (*image_paths: str) -> Image.Image:
     exposures = [ToTensor()(exposure) for exposure in exposures]
     exposure_stack = stack(exposures, dim=0).to(device)
     exposure_stack = 2. * exposure_stack.pow(1. / 2.2) - 1.
-    # Chromaticity noise reduction # INCOMPLETE
-
+    # Chromaticity noise reduction
+    yuv = rgb_to_yuv(exposure_stack)
+    y, u, v = yuv.split(1, dim=1)
+    u = bilateral_filter_2d(u, (3, 5), grid_size=(8, 1024, 1024))
+    v = bilateral_filter_2d(v, (3, 5), grid_size=(8, 1024, 1024))
+    yuv = cat([y, u, v], dim=1)
+    exposure_stack = yuv_to_rgb(yuv)
     # Tone curve
     tone_curve_path = resource_filename("plasma.io", "data/raw_standard_med.tif")
     tone_curve = lutread(tone_curve_path)
