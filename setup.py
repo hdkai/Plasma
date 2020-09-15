@@ -33,7 +33,6 @@ setup(
     packages=find_packages(exclude=["examples", "playground", "test", "train"]),
     package_data={
         "plasma.io": ["data/*.tif"],
-        "plasma.structure": ["*.pt"]
     },
     classifiers=[
         "Programming Language :: Python :: 3",
