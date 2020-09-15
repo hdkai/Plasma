@@ -55,9 +55,11 @@ def selective_color (input: Tensor, colors: Tensor, hue_adj: Tensor, sat_adj: Te
 def _selective_color_weight_map (input: Tensor, color: Tensor) -> Tensor:
     """
     Compute the color weight map for selective coloring.
+    
     Parameters:
         input (Tensor): Input image with shape (N,3,H,W) in [-1., 1.]
         color (Tensor): Basis colors with shape (M,3) in [0., 1.]
+    
     Returns:
         Tensor: Color weight map with shape (N,M,H,W) in [0., 1.]
     """    
