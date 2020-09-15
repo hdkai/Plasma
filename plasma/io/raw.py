@@ -3,6 +3,7 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
+from numpy import allclose, array
 from pathlib import Path
 from PIL import Image
 from pkg_resources import resource_filename
@@ -36,12 +37,15 @@ def rawread (*image_paths: str) -> Image.Image:
         with imread(image_path) as raw:
             # Repair bad pixels
             repair_bad_pixels(raw, bad_pixels, method="median")
+            # Compute saturation level
+            white_level = array(raw.camera_white_level_per_channel).min()
+            saturation_level = raw.white_level if white_level == 0 else white_level
             # Demosaic
             params = Params(
                 demosaic_algorithm=DemosaicAlgorithm.AHD,
                 use_camera_wb=True,
                 no_auto_bright=True,
-                user_sat=11000,
+                user_sat=saturation_level,
                 output_bps=8,
                 highlight_mode=HighlightMode.Clip,
                 gamma=(1, 1)
