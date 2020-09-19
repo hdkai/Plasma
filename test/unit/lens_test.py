@@ -1,12 +1,12 @@
 # 
-#   Rio
+#   Plasma
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
 from PIL import Image
 from pytest import fixture, mark
 
-from rio import lens_correction
+from plasma.io import lens_correction
 
 def test_single_no_exif ():
     image_path = "test/media/lens/1.jpg"

@@ -3,7 +3,7 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
-from torch import clamp, lerp, where, Tensor
+from torch import lerp, where, Tensor
 from typing import Union
 
 from ..conversion import rgb_to_luminance
@@ -21,12 +21,13 @@ def clarity (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
         Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
     """
     base_layer = bilateral_filter_2d(input, kernel_size=(5, 11), grid_size=(16, 512, 512))
-    base_layer = clamp((base_layer + 1.) * 1.1 - 1., max=1.) # Brighten to mimic LR
+    base_layer = (base_layer + 1.) * 1.1 - 1. # Brighten to mimic LR
+    base_layer = base_layer.clamp(max=1.)
     result = lerp(base_layer, input, 1. + weight)
-    result = clamp(result, min=-1., max=1.)
+    result = result.clamp(min=-1., max=1.)
     return result
 
-def highlights (input: Tensor, weight: Union[float, Tensor], tonal_range: float = 1.) -> Tensor:
+def highlights (input: Tensor, weight: Union[float, Tensor], tonal_range: float=1.) -> Tensor:
     """
     Apply highlight attentuation to an image.
 
@@ -38,16 +39,16 @@ def highlights (input: Tensor, weight: Union[float, Tensor], tonal_range: float 
         Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
     """
     # Compute mask
-    luma = -rgb_to_luminance(input)
-    mask = bilateral_filter_2d(luma, kernel_size=(5, 11), grid_size=(16, 64, 64))
+    mask = -rgb_to_luminance(input)
+    #mask = bilateral_filter_2d(mask, kernel_size=(5, 11), grid_size=(16, 64, 64))
     mask = mask + (1. - tonal_range)
-    mask = clamp(mask, min=-1., max=0.)
+    mask = mask.clamp(min=-1., max=0.)
     # Blend
     mask = -weight * mask
-    result = _blend_overlay(input, mask)
+    result = _blend_soft_light(input, mask)
     return result
 
-def shadows (input: Tensor, weight: Union[float, Tensor], tonal_range: float = 1.) -> Tensor:
+def shadows (input: Tensor, weight: Union[float, Tensor], tonal_range: float=1.) -> Tensor:
     """
     Apply shadow attentuation to an image.
 
@@ -62,13 +63,14 @@ def shadows (input: Tensor, weight: Union[float, Tensor], tonal_range: float = 1
     luma = -rgb_to_luminance(input)
     mask = bilateral_filter_2d(luma, kernel_size=(5, 11), grid_size=(16, 64, 64))
     mask = mask - (1. - tonal_range)
-    mask = clamp(mask, min=0., max=1.)
+    mask = mask.clamp(min=0., max=1.)
     # Blend
     mask = weight * mask
     result = _blend_soft_light(input, mask)
     # Contrast scale
     contrast = 1. + 0.2 * abs(weight)
-    result = clamp(result * contrast, min=-1., max=1.)
+    result = result * contrast
+    result = result.clamp(min=-1., max=1.)
     return result
 
 def sharpen (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
@@ -84,7 +86,7 @@ def sharpen (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
     """
     base_layer = gaussian_blur_2d(input, (5, 5))
     result = lerp(base_layer, input, 1. + weight)
-    result = clamp(result, min=-1., max=1.)
+    result = result.clamp(min=-1., max=1.)
     return result
 
 def _blend_overlay (base: Tensor, overlay: Tensor) -> Tensor:

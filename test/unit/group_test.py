@@ -6,7 +6,7 @@
 from pathlib import Path
 from pytest import fixture, mark
 
-from rio import group_exposures
+from plasma.io import group_exposures
 
 def test_single_image ():
     exposure_paths = [
