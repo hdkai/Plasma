@@ -50,7 +50,7 @@ def top_bottom_gradient (input: Tensor, length: Union[float, Tensor]):
     field = 1. - (field / length).clamp(max=1.)
     return field
 
-def bottom_top_gradient (input: Tensor, length: Union[float, Tensor]) -> Tensor: # INCOMPLETE
+def bottom_top_gradient (input: Tensor, length: Union[float, Tensor]) -> Tensor:
     """
     Create a vertical gradient which starts from the bottom of the given image.
 
@@ -61,9 +61,13 @@ def bottom_top_gradient (input: Tensor, length: Union[float, Tensor]) -> Tensor:
     Returns:
         Tensor: Gradient mask with shape (N,1,H,W) in range [0., 1.].
     """
-    pass
+    samples, _, height, width = input.shape
+    field = linspace(1., 0., height).to(input.device)
+    field = field.repeat(samples, 1, width, 1).permute(0, 1, 3, 2).contiguous()
+    field = 1. - (field / length).clamp(max=1.)
+    return field
 
-def left_right_gradient (input: Tensor, length: Union[float, Tensor]) -> Tensor: # INCOMPLETE
+def left_right_gradient (input: Tensor, length: Union[float, Tensor]) -> Tensor:
     """
     Create a horizontal gradient which starts from the left of the given image.
 
@@ -74,9 +78,13 @@ def left_right_gradient (input: Tensor, length: Union[float, Tensor]) -> Tensor:
     Returns:
         Tensor: Gradient mask with shape (N,1,H,W) in range [0., 1.].
     """
-    pass
+    samples, _, height, width = input.shape
+    field = linspace(0., 1., width).to(input.device)
+    field = field.repeat(samples, 1, height, 1)
+    field = 1. - (field / length).clamp(max=1.)
+    return field
 
-def right_left_gradient (input: Tensor, length: Union[float, Tensor]) -> Tensor: # INCOMPLETE
+def right_left_gradient (input: Tensor, length: Union[float, Tensor]) -> Tensor:
     """
     Create a horizontal gradient which starts from the right of the given image.
 
@@ -87,4 +95,8 @@ def right_left_gradient (input: Tensor, length: Union[float, Tensor]) -> Tensor:
     Returns:
         Tensor: Gradient mask with shape (N,1,H,W) in range [0., 1.].
     """
-    pass
+    samples, _, height, width = input.shape
+    field = linspace(1., 0., width).to(input.device)
+    field = field.repeat(samples, 1, height, 1)
+    field = 1. - (field / length).clamp(max=1.)
+    return field

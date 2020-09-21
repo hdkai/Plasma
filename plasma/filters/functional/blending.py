@@ -7,7 +7,14 @@ from torch import where, Tensor
 
 def blend_overlay (base: Tensor, overlay: Tensor) -> Tensor:
     """
+    Blend two images using overlay blending.
 
+    Parameters:
+        base (Tensor): Base image with shape (N,C,H,W) in range [-1., 1.].
+        overlay (Tensor): Overlay image with shape (N,C,H,W) in range [-1., 1.].
+
+    Returns:
+        Tensor: Blended image with shape (N,C,H,W) in range [-1., 1.].
     """
     # Rescale
     base = (base + 1.) / 2.
@@ -20,9 +27,18 @@ def blend_overlay (base: Tensor, overlay: Tensor) -> Tensor:
     result = 2. * result - 1.
     return result
 
-def blend_soft_light (base: Tensor, overlay: Tensor) -> Tensor: # Use Photoshop blending
+def blend_soft_light (base: Tensor, overlay: Tensor) -> Tensor:
     """
+    Blend two images using soft light blending.
 
+    We utilize the Photoshop discontinuity.
+
+    Parameters:
+        base (Tensor): Base image with shape (N,C,H,W) in range [-1., 1.].
+        overlay (Tensor): Overlay image with shape (N,C,H,W) in range [-1., 1.].
+
+    Returns:
+        Tensor: Blended image with shape (N,C,H,W) in range [-1., 1.].
     """
     # Rescale
     base = (base + 1.) / 2.

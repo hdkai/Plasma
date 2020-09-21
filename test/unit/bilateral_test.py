@@ -3,8 +3,6 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
-from imageio import imwrite
-from numpy import linspace, tile, uint16
 from pytest import fixture, mark
 from .common import tensorread, tensorwrite
 
