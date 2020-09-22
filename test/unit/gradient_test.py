@@ -14,6 +14,12 @@ def test_radial_gradient ():
     mask = radial_gradient(input, 0.75)
     tensorwrite("radial.jpg", mask)
 
+def test_vignette_gradient ():
+    input = zeros(1, 1, 720, 1280)
+    mask = 1. - radial_gradient(input, 2.5)
+    mask = 2. * mask - 1.
+    tensorwrite("vignette.jpg", mask)
+
 def test_top_bottom_gradient ():
     input = zeros(1, 1, 720, 1280)
     mask = top_bottom_gradient(input, 0.25)
