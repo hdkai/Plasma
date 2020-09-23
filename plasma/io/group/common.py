@@ -30,7 +30,7 @@ def exposure_timestamp (path: str) -> float:
     time = tags.get(DATETIME_ORIGINAL)
     return parse_datetime(str(time)).timestamp() if time is not None else -1
 
-def load_exposure (image_path: str) -> ndarray:
+def load_exposure (image_path: str, size=512) -> ndarray:
     """
     Load an exposure into memory.
 
@@ -39,6 +39,7 @@ def load_exposure (image_path: str) -> ndarray:
     
     Parameters:
         image_path (str): Path to exposure.
+        size (int): Image size.
     
     Returns:
         ndarray: Loaded exposure.
@@ -72,7 +73,7 @@ def load_exposure (image_path: str) -> ndarray:
                 image = raw.postprocess(params=params)
                 image = cvtColor(image, COLOR_RGB2GRAY)
     # Downsample
-    image = resize(image, (512, 512), interpolation=INTER_AREA)
+    image = resize(image, (size, size), interpolation=INTER_AREA)
     return image
 
 def normalize_exposures (image_a, image_b) -> Tuple[ndarray, ndarray]:

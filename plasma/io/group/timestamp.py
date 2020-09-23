@@ -23,6 +23,9 @@ def group_exposures_by_timestamp (exposure_paths: List[str], max_delta=8.) -> Li
     # Check
     if not exposure_paths:
         return []
+    # Trivial case
+    if len(exposure_paths) == 1:
+        return [exposure_paths]
     # Get timestamps
     timestamps = [exposure_timestamp(path) for path in exposure_paths]
     timestamps = [time if time >= 0 else -(i + 1) * max_delta * 10 for i, time in enumerate(timestamps)]

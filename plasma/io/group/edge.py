@@ -10,7 +10,7 @@ from typing import Iterable, List, Tuple
 
 from .common import exposure_timestamp, load_exposure, normalize_exposures
 
-def group_exposures_by_edges (exposure_paths: List[str], min_similarity=0.35, workers=4) -> List[List[str]]:
+def group_exposures_by_edges (exposure_paths: List[str], min_similarity=0.35, workers=8) -> List[List[str]]:
     """
     Group a set of exposures by their mutual edges.
 
@@ -25,11 +25,14 @@ def group_exposures_by_edges (exposure_paths: List[str], min_similarity=0.35, wo
     # Check
     if not exposure_paths:
         return []
+    # Trivial case
+    if len(exposure_paths) == 1:
+        return [exposure_paths]
     # Sort by EXIF timestamp
     exposure_paths = sorted(exposure_paths, key=lambda path: exposure_timestamp(path))
     # Load all exposures into memory, thread this, `map` preserves order
     with ThreadPoolExecutor(max_workers=workers) as executor:
-        exposures = executor.map(load_exposure, exposure_paths)
+        exposures = executor.map(lambda path: load_exposure(path, 512), exposure_paths)
     # Group
     groups = _group_exposures(exposure_paths, exposures, min_similarity)
     return groups
