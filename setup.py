@@ -27,6 +27,7 @@ setup(
         "pillow",
         "python-dateutil",
         "rawpy",
+        "scikit-learn",
         "torch",
         "torchvision"
     ],
