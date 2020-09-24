@@ -25,6 +25,7 @@ setup(
         "opencv-python",
         "piexif",
         "pillow",
+        "python-dateutil",
         "rawpy",
         "torch",
         "torchvision"
