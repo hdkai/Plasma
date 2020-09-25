@@ -3,14 +3,14 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
-from torch import cat, clamp, linspace, meshgrid, ones_like, stack, Tensor
+from torch import cat, isnan, linspace, meshgrid, ones_like, stack, Tensor
 from torch.nn.functional import grid_sample, interpolate, pad
 from typing import Optional, Tuple
 
 from ..conversion import rgb_to_luminance
 from .gaussian import gaussian_blur_3d
 
-def bilateral_filter_2d (input: Tensor, kernel_size: Tuple[int, int], grid_size: Optional[Tuple[int, int, int]] = None) -> Tensor:
+def bilateral_filter_2d (input: Tensor, kernel_size: Tuple[int, int], grid_size: Optional[Tuple[int, int, int]]=None) -> Tensor:
     """
     Apply the bilateral filter to a 2D image.
 
@@ -75,14 +75,14 @@ def splat_bilateral_grid (input: Tensor, guide: Tensor, grid_size: Tuple[int, in
     # Return
     return intensity_grid, weight_grid
 
-def slice_bilateral_grid (input: Tensor, guide: Tensor, weight: Optional[Tensor] = None) -> Tensor:
+def slice_bilateral_grid (input: Tensor, guide: Tensor, weight: Optional[Tensor]=None) -> Tensor:
     """
     Slice a 3D bilateral grid into a 2D image.
 
     Parameters:
         input (Tensor): Input bilateral grid with shape (N,C,I,Sy,Sx).
         guide (Tensor): Slicing guide map with shape (N,1,H,W) in [-1., 1.].
-        weight (Tensor): Bilateral weight grid with shape (N,C,I,Sy,Sx) in [0., 1.]. If `None`, then no homogenous divide is performed.
+        weight (Tensor): Bilateral weight grid with shape (N,C,I,Sy,Sx) in [0., 1.]. If `None`, then homogenous divide is not performed.
 
     Returns:
         Tensor: Sliced image with shape (N,C,H,W).
@@ -99,6 +99,6 @@ def slice_bilateral_grid (input: Tensor, guide: Tensor, weight: Optional[Tensor]
     result = grid_sample(input, slice_grid, mode="bilinear", padding_mode="reflection", align_corners=False).squeeze(dim=2)
     weight = grid_sample(weight, slice_grid, mode="bilinear", padding_mode="reflection", align_corners=False).squeeze(dim=2) if weight is not None else ones_like(result)
     # Normalize # Prevent divide by zero
-    weight = clamp(weight, min=1e-3)
     result = result / weight
+    result = result.masked_fill(isnan(result), 0.)
     return result
