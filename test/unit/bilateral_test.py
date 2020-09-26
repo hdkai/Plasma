@@ -7,6 +7,7 @@ from pytest import fixture, mark
 from torch import isnan, zeros, zeros_like
 from .common import tensorread, tensorwrite
 
+from plasma.filters import clarity, texture
 from plasma.sampling import bilateral_filter_2d, slice_bilateral_grid
 
 IMAGE_PATHS = [
@@ -17,13 +18,9 @@ IMAGE_PATHS = [
     "test/media/filter/5.jpg",
     "test/media/filter/6.jpg",
     "test/media/filter/7.jpg",
+    "test/media/filter/8.jpg",
+    "test/media/filter/9.jpg",
 ]
-
-@mark.parametrize("image_path", IMAGE_PATHS)
-def test_bilateral_filter (image_path):
-    image = tensorread(image_path)
-    result = bilateral_filter_2d(image, kernel_size=(5, 9), grid_size=(16, 512, 512))
-    tensorwrite("bilateral.jpg", result)
 
 def test_bilateral_slice ():
     grid = zeros(1, 1, 16, 64, 64)
@@ -31,3 +28,15 @@ def test_bilateral_slice ():
     weight = zeros_like(grid)
     sliced = slice_bilateral_grid(grid, guide, weight)
     assert not isnan(sliced).any()
+
+@mark.parametrize("image_path", IMAGE_PATHS)
+def test_coarse_local_contrast (image_path):
+    image = tensorread(image_path, size=None)
+    result = clarity(image, 1.)
+    tensorwrite("coarse.jpg", result)
+
+@mark.parametrize("image_path", IMAGE_PATHS)
+def test_fine_local_contrast (image_path):
+    image = tensorread(image_path, size=None)
+    result = texture(image, 1.)
+    tensorwrite("fine.jpg", result)

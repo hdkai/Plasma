@@ -8,6 +8,7 @@ from torch.nn.functional import grid_sample, interpolate, pad
 from typing import Optional, Tuple
 
 from ..conversion import rgb_to_luminance
+
 from .gaussian import gaussian_blur_3d
 
 def bilateral_filter_2d (input: Tensor, kernel_size: Tuple[int, int], grid_size: Optional[Tuple[int, int, int]]=None) -> Tensor:
@@ -56,8 +57,8 @@ def splat_bilateral_grid (input: Tensor, guide: Tensor, grid_size: Tuple[int, in
     samples, _,_,_ = input.shape
     intensity_bins, spatial_bins_y, spatial_bins_x = grid_size
     # Downsample
-    downsampled_input = interpolate(input, size=(spatial_bins_x, spatial_bins_y), mode="bilinear", align_corners=False) # NxCxSxS
-    downsampled_guide = interpolate(guide, size=(spatial_bins_x, spatial_bins_y), mode="bilinear", align_corners=False) # Nx1xSxS
+    downsampled_input = interpolate(input, size=(spatial_bins_y, spatial_bins_x), mode="bilinear", align_corners=False) # NxCxSxS
+    downsampled_guide = interpolate(guide, size=(spatial_bins_y, spatial_bins_x), mode="bilinear", align_corners=False) # Nx1xSxS
     # Create volumes
     input_grid = downsampled_input.unsqueeze(dim=2) # NxCx1xSxS
     volume_padding = (0, 0, 0, 0, 0, intensity_bins - 1, 0, 0)
