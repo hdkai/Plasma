@@ -1,0 +1,12 @@
+imageio
+matplotlib
+numpy
+opencv-python
+pillow
+requests
+scikit-learn
+tableprint
+torch
+torchvision
+torchsummary
+tqdm

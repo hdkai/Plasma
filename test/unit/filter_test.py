@@ -7,7 +7,7 @@ from numpy import linspace
 from pytest import fixture, mark
 from .common import tensorread, tensorwrite
 
-from plasma.filters import contrast, clarity, exposure, highlights, saturation, shadows, sharpen, temperature, tint
+from plasma.filters import contrast, clarity, exposure, highlights, saturation, shadows, sharpen, temperature, texture, tint
 
 IMAGE_PATHS = [
     "test/media/filter/1.jpg",
@@ -18,6 +18,7 @@ IMAGE_PATHS = [
     "test/media/filter/6.jpg",
     "test/media/filter/7.jpg",
     "test/media/filter/8.jpg",
+    "test/media/filter/9.jpg",
 ]
 
 @mark.parametrize("image_path", IMAGE_PATHS)
@@ -75,6 +76,12 @@ def test_temperature (image_path):
     image = tensorread(image_path)
     results = [temperature(image, weight) for weight in linspace(-1., 1., 20)]
     tensorwrite("temperature.gif", *results)
+
+@mark.parametrize("image_path", IMAGE_PATHS)
+def test_texture (image_path):
+    image = tensorread(image_path)
+    results = [texture(image, weight) for weight in linspace(-1., 1., 20)]
+    tensorwrite("texture.gif", *results)
 
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_tint (image_path):
