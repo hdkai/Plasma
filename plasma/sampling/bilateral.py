@@ -8,7 +8,6 @@ from torch.nn.functional import grid_sample, interpolate, pad
 from typing import Optional, Tuple
 
 from ..conversion import rgb_to_luminance
-
 from .gaussian import gaussian_blur_3d
 
 def bilateral_filter_2d (input: Tensor, kernel_size: Tuple[int, int], grid_size: Optional[Tuple[int, int, int]]=None) -> Tensor:

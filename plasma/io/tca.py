@@ -5,7 +5,7 @@
 
 from PIL import Image
 
-def tca_correction (*images: Image.Image) -> Image.Image:
+def tca_correction (*images: Image.Image) -> Image.Image: # INCOMPLETE
     """
     Appply transverse chromatic aberration correction on an image.
 

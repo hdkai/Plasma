@@ -8,7 +8,6 @@ from typing import Union
 
 from ..conversion import rgb_to_luminance, rgb_to_yuv, yuv_to_rgb
 from ..sampling import bilateral_filter_2d, gaussian_blur_2d
-
 from .functional import blend_soft_light
 
 def clarity (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
