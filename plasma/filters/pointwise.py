@@ -4,11 +4,10 @@
 #
 
 from torch import cat, clamp, Tensor
-from typing import Union
 
 from ..conversion import rgb_to_yuv, yuv_to_rgb
 
-def contrast (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
+def contrast (input: Tensor, weight: Tensor) -> Tensor:
     """
     Apply contrast adjustment to an image.
 
@@ -23,7 +22,7 @@ def contrast (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
     result = result.clamp(min=-1., max=1.)
     return result
 
-def exposure (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
+def exposure (input: Tensor, weight: Tensor) -> Tensor:
     """
     Apply exposure adjustment to an image.
 
@@ -40,7 +39,7 @@ def exposure (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
     result = result.clamp(min=-1., max=1.)
     return result
 
-def saturation (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
+def saturation (input: Tensor, weight: Tensor) -> Tensor:
     """
     Apply saturation adjustment to an image.
 
@@ -59,7 +58,7 @@ def saturation (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
     result = yuv_to_rgb(yuv)
     return result
 
-def temperature (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
+def temperature (input: Tensor, weight: Tensor) -> Tensor:
     """
     Apply temperature adjustment to an image.
 
@@ -78,7 +77,7 @@ def temperature (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
     result = yuv_to_rgb(yuv)
     return result
 
-def tint (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
+def tint (input: Tensor, weight: Tensor) -> Tensor:
     """
     Apply tint adjustment to an image.
 

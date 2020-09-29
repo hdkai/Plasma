@@ -4,13 +4,12 @@
 #
 
 from torch import cat, lerp, where, Tensor
-from typing import Union
 
 from ..conversion import rgb_to_luminance, rgb_to_yuv, yuv_to_rgb
 from ..sampling import bilateral_filter_2d, gaussian_blur_2d
 from .functional import blend_soft_light
 
-def clarity (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
+def clarity (input: Tensor, weight: Tensor) -> Tensor:
     """
     Apply coarse local contrast to an image.
 
@@ -29,7 +28,7 @@ def clarity (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
     result = result.clamp(min=-1., max=1.)
     return result
 
-def highlights (input: Tensor, weight: Union[float, Tensor], tonal_range: float=1.) -> Tensor:
+def highlights (input: Tensor, weight: Tensor, tonal_range: float=1.) -> Tensor:
     """
     Apply highlight attentuation to an image.
 
@@ -49,7 +48,7 @@ def highlights (input: Tensor, weight: Union[float, Tensor], tonal_range: float=
     result = blend_soft_light(input, mask)
     return result
 
-def shadows (input: Tensor, weight: Union[float, Tensor], tonal_range: float=1.) -> Tensor:
+def shadows (input: Tensor, weight: Tensor, tonal_range: float=1.) -> Tensor:
     """
     Apply shadow attentuation to an image.
 
@@ -74,7 +73,7 @@ def shadows (input: Tensor, weight: Union[float, Tensor], tonal_range: float=1.)
     result = result.clamp(min=-1., max=1.)
     return result
 
-def sharpen (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
+def sharpen (input: Tensor, weight: Tensor) -> Tensor:
     """
     Apply sharpness enhancement to an image.
 
@@ -90,7 +89,7 @@ def sharpen (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
     result = result.clamp(min=-1., max=1.)
     return result
 
-def texture (input: Tensor, weight: Union[float, Tensor]) -> Tensor:
+def texture (input: Tensor, weight: Tensor) -> Tensor:
     """
     Apply fine local contrast to an image.
 
