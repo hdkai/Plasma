@@ -95,8 +95,8 @@ def _tca_forward (input: Tensor, red_coeffs: ndarray, blue_coeffs: ndarray) -> T
     # Construct sample grid
     batch, _, height, width = input.shape
     hg, wg = meshgrid(linspace(-1., 1., height), linspace(-1., 1., width))
-    hg = hg.repeat(batch, 1, 1).unsqueeze(dim=3)
-    wg = wg.repeat(batch, 1, 1).unsqueeze(dim=3)
+    hg = hg.repeat(batch, 1, 1).unsqueeze(dim=3).to(input.device)
+    wg = wg.repeat(batch, 1, 1).unsqueeze(dim=3).to(input.device)
     sample_field = cat([wg, hg], dim=3)
     r_dst = sample_field.norm(dim=3, keepdim=True)
     # Compute distortions
