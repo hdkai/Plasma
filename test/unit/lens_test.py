@@ -8,11 +8,10 @@ from pytest import fixture, mark
 
 from plasma.io import lens_correction
 
-def test_single_no_exif ():
+def test_single_lens_correction_no_exif ():
     image_path = "test/media/lens/1.jpg"
     image = Image.open(image_path)
     result = lens_correction(image)
-    print(result)
     result.save(f"lens.jpg")
 
 def test_single_lens_correction ():
