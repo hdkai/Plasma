@@ -6,3 +6,4 @@
 from .pointwise import contrast, exposure, saturation, temperature, tint
 from .selective import selective_color
 from .spectral import clarity, highlights, shadows, sharpen, texture
+from .tone import tone_curve
