@@ -16,7 +16,7 @@ def lutread (path: str) -> Tensor:
         path (str): Path to LUT file.
 
     Returns:
-        Tensor: 1D LUT with shape (L,) in [-1., 1.].
+        Tensor: 1D LUT with shape (L,) in range [-1., 1.].
     """
     # Load
     image = imread(path) / 65536
@@ -36,7 +36,7 @@ def cuberead (path: str) -> Tensor:
         path (str): Path to CUBE file.
 
     Returns:
-        Tensor: 3D LUT with shape (L,L,L,3) in [-1., 1.].
+        Tensor: 3D LUT with shape (L,L,L,3) in range [-1., 1.].
     """
     # Read coeffients
     with open(path) as file:

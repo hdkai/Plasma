@@ -11,11 +11,11 @@ def color_sample_1d (input: Tensor, lut: Tensor) -> Tensor:
     Apply a 1D look-up table to an image.
 
     Parameters:
-        input (Tensor): RGB image with shape (N,3,H,W) in [-1., 1.].
-        lut (Tensor): Lookup table with shape (L,) in [-1., 1.].
+        input (Tensor): RGB image with shape (N,3,H,W) in range [-1., 1.].
+        lut (Tensor): Lookup table with shape (L,) in range [-1., 1.].
 
     Returns:
-        Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
+        Tensor: Filtered image with shape (N,3,H,W) in range [-1., 1.].
     """
     # Create volume
     batch,_,_,_ = input.shape
@@ -36,11 +36,11 @@ def color_sample_3d (input: Tensor, cube: Tensor) -> Tensor:
     Apply a 3D look-up table to an image.
 
     Parameters:
-        input (Tensor): RGB image with shape (N,3,H,W) in [-1., 1.].
-        cube (Tensor): Lookup table with shape (L,L,L,3) in [-1., 1.].
+        input (Tensor): RGB image with shape (N,3,H,W) in range [-1., 1.].
+        cube (Tensor): Lookup table with shape (L,L,L,3) in range [-1., 1.].
 
     Returns:
-        Tensor: Filtered image with shape (N,3,H,W) in [-1., 1.].
+        Tensor: Filtered image with shape (N,3,H,W) in range [-1., 1.].
     """
     # Create volume
     batch,_,_,_ = input.shape

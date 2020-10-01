@@ -14,14 +14,14 @@ def selective_color (input: Tensor, colors: Tensor, hue_adj: Tensor, sat_adj: Te
     All `M` filters are applied simultaneously.
 
     Parameters:
-        input (Tensor): Input RGB image with shape (N,3,H,W) in [-1., 1.]
-        colors (Tensor): Basis RGB colors with shape (M,3) in [0., 1.]
-        hue_adj (Tensor): Hue adjustment with shape (N,M,H,W) in [-1., 1.]
-        sat_adj (Tensor): Saturation adjustment with shape (N,M,H,W) in [-1., 1.]
-        exp_adj (Tensor): Exposure adjustment with shape (N,M,H,W) in [-1., 1.]
+        input (Tensor): Input RGB image with shape (N,3,H,W) in range [-1., 1.]
+        colors (Tensor): Basis RGB colors with shape (M,3) in range [0., 1.]
+        hue_adj (Tensor): Hue adjustment with shape (N,M,H,W) in range [-1., 1.]
+        sat_adj (Tensor): Saturation adjustment with shape (N,M,H,W) in range [-1., 1.]
+        exp_adj (Tensor): Exposure adjustment with shape (N,M,H,W) in range [-1., 1.]
 
     Returns:
-        Tensor: Result image with shape (N,3,H,W) in [-1., 1.]
+        Tensor: Result image with shape (N,3,H,W) in range [-1., 1.]
     """
     # Compute weights
     batch, _, height, width  = input.shape
@@ -57,11 +57,11 @@ def _selective_color_weight_map (input: Tensor, color: Tensor) -> Tensor:
     Compute the color weight map for selective coloring.
     
     Parameters:
-        input (Tensor): Input image with shape (N,3,H,W) in [-1., 1.]
-        color (Tensor): Basis colors with shape (M,3) in [0., 1.]
+        input (Tensor): Input image with shape (N,3,H,W) in range [-1., 1.]
+        color (Tensor): Basis colors with shape (M,3) in range [0., 1.]
     
     Returns:
-        Tensor: Color weight map with shape (N,M,H,W) in [0., 1.]
+        Tensor: Color weight map with shape (N,M,H,W) in range [0., 1.]
     """    
     # Convert basis range
     color = (2.0 * color - 1.0).unsqueeze(dim=2)
