@@ -3,7 +3,7 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
-from torch import cat, isnan, linspace, meshgrid, ones_like, stack, Tensor
+from torch import cat, linspace, meshgrid, ones, ones_like, stack, where, Tensor
 from torch.nn.functional import grid_sample, interpolate, pad
 from typing import Optional, Tuple
 
@@ -24,45 +24,39 @@ def bilateral_filter_2d (input: Tensor, kernel_size: Tuple[int, int], grid_size:
     """
     kernel_size = (kernel_size[0], kernel_size[1], kernel_size[1])
     grid_size = grid_size if grid_size is not None else (16, 512, 512)
-    # Filter each channel independently
     channels = input.split(1, dim=1)
     luminance = rgb_to_luminance(input) if input.shape[1] == 3 else input
-    filtered_channels = []
+    result = []
     for channel in channels:
-        # Construct grid
-        intensity_grid, weight_grid = splat_bilateral_grid(channel, luminance, grid_size)
-        # Filter
-        intensity_grid = gaussian_blur_3d(intensity_grid, kernel_size)
-        weight_grid = gaussian_blur_3d(weight_grid, kernel_size)
-        # Slice
-        filtered_channel = slice_bilateral_grid(intensity_grid, luminance, weight_grid)
-        filtered_channels.append(filtered_channel)
-    # Stack
-    result = cat(filtered_channels, dim=1)
+        grid = splat_bilateral_grid(channel, luminance, grid_size)
+        grid = gaussian_blur_3d(grid, kernel_size)
+        channel = slice_bilateral_grid(grid, luminance, homogenous=True)
+        result.append(channel)
+    result = cat(result, dim=1)
     return result
 
-def splat_bilateral_grid (input: Tensor, guide: Tensor, grid_size: Tuple[int, int, int]) -> Tuple[Tensor, Tensor]:
+def splat_bilateral_grid (input: Tensor, guide: Tensor, grid_size: Tuple[int, int, int]) -> Tensor:
     """
-    Splat a 2D image into a 3D bilateral grid.
+    Splat an image into a homogenous bilateral grid.
 
     Parameters:
         input (Tensor): Input image with shape (N,C,H,W).
-        guide (Tensor): Splatting guide map with shape (N,1,H,W) in [-1., 1.].
+        guide (Tensor): Splatting guide map with shape (N,1,H,W) in range [-1., 1.].
         grid_size (tuple): Grid size in each dimension (I,Sy,Sx).
 
     Returns:
-        tuple: Bilateral grid with shape (N,C,I,Sy,Sx); and weight grid with same shape in [0., 1.].
+        tuple: Bilateral grid with shape (N,D,I,Sy,Sx), where D = C + 1.
     """
     samples, _,_,_ = input.shape
     intensity_bins, spatial_bins_y, spatial_bins_x = grid_size
     # Downsample
     downsampled_input = interpolate(input, size=(spatial_bins_y, spatial_bins_x), mode="bilinear", align_corners=False) # NxCxSxS
     downsampled_guide = interpolate(guide, size=(spatial_bins_y, spatial_bins_x), mode="bilinear", align_corners=False) # Nx1xSxS
-    # Create volumes
+    # Create volume
     input_grid = downsampled_input.unsqueeze(dim=2) # NxCx1xSxS
-    volume_padding = (0, 0, 0, 0, 0, intensity_bins - 1, 0, 0)
-    input_volume = pad(input_grid, volume_padding, "constant", 0.) # NxCxIxSxS
-    weight_volume = pad(ones_like(input_grid), volume_padding, "constant", 0.)
+    weight_grid = ones(samples, 1, 1, spatial_bins_y, spatial_bins_x).to(input.device) # Nx1x1xSxS
+    input_grid = cat([input_grid, weight_grid], dim=1) # NxDx1xSxS
+    input_volume = pad(input_grid, (0, 0, 0, 0, 0, intensity_bins - 1, 0, 0), "constant", 0.) # NxCxIxSxS
     # Create sample grid
     ig, hg, wg = meshgrid(linspace(-1., 1., intensity_bins), linspace(-1., 1., spatial_bins_y), linspace(-1., 1., spatial_bins_x))
     ig = ig.repeat(samples, 1, 1, 1).to(input.device) - (downsampled_guide + 1.)
@@ -71,22 +65,21 @@ def splat_bilateral_grid (input: Tensor, guide: Tensor, grid_size: Tuple[int, in
     sample_grid = stack([wg, hg, ig], dim=4)
     # Sample
     intensity_grid = grid_sample(input_volume, sample_grid, mode="bilinear", padding_mode="reflection", align_corners=False)
-    weight_grid = grid_sample(weight_volume, sample_grid, mode="bilinear", padding_mode="reflection", align_corners=False)
-    # Return
-    return intensity_grid, weight_grid
+    return intensity_grid
 
-def slice_bilateral_grid (input: Tensor, guide: Tensor, weight: Optional[Tensor]=None) -> Tensor:
+def slice_bilateral_grid (input: Tensor, guide: Tensor, homogenous: bool=False) -> Tensor:
     """
-    Slice a 3D bilateral grid into a 2D image.
+    Slice a bilateral grid to produce image.
 
     Parameters:
-        input (Tensor): Input bilateral grid with shape (N,C,I,Sy,Sx).
+        input (Tensor): Input bilateral grid with shape (N,D,I,Sy,Sx).
         guide (Tensor): Slicing guide map with shape (N,1,H,W) in [-1., 1.].
-        weight (Tensor): Bilateral weight grid with shape (N,C,I,Sy,Sx) in [0., 1.]. If `None`, then homogenous divide is not performed.
+        homogenous (bool): Whether a homogenous divide is to be performed. The last channel is assumed to be the homogenous coordinate.
 
     Returns:
-        Tensor: Sliced image with shape (N,C,H,W).
+        Tensor: Sliced image with shape (N,C,H,W), where C = D - 1 if homogenous else D.
     """
+    _, channels, _, _, _ = input.shape
     samples, _, height, width = guide.shape
     # Create slice grid
     hg, wg = meshgrid(linspace(-1., 1., height), linspace(-1., 1., width))
@@ -96,9 +89,13 @@ def slice_bilateral_grid (input: Tensor, guide: Tensor, weight: Optional[Tensor]
     slice_grid = cat([wg, hg, slice_grid], dim=3)           # NxHxWx3
     slice_grid = slice_grid.unsqueeze(dim=1)                # Nx1xHxWx3
     # Sample
-    result = grid_sample(input, slice_grid, mode="bilinear", padding_mode="reflection", align_corners=False).squeeze(dim=2)
-    weight = grid_sample(weight, slice_grid, mode="bilinear", padding_mode="reflection", align_corners=False).squeeze(dim=2) if weight is not None else ones_like(result)
-    # Normalize # Prevent divide by zero
+    result = grid_sample(input, slice_grid, mode="bilinear", padding_mode="reflection", align_corners=False)
+    result = result.squeeze(dim=2)  # NxDxHxW
+    # Check for homogenous divide
+    if not homogenous:
+        return result
+    # Perform homogenous divide
+    result, weight = result.split(channels-1, dim=1)
+    weight = where(weight <= 0, ones_like(weight), weight) # Prevent divide by zero
     result = result / weight
-    result = result.masked_fill(isnan(result), 0.)
     return result

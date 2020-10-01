@@ -32,11 +32,11 @@ def test_bilateral_slice ():
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_coarse_local_contrast (image_path):
     image = tensorread(image_path, size=None)
-    result = clarity(image, 1.)
+    result = clarity(image, -1.)
     tensorwrite("coarse.jpg", result)
 
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_fine_local_contrast (image_path):
     image = tensorread(image_path, size=None)
-    result = texture(image, 1.)
+    result = texture(image, -1.)
     tensorwrite("fine.jpg", result)

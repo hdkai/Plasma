@@ -15,6 +15,7 @@ IMAGE_PATHS = [
     "test/media/filter/2.jpg",
     "test/media/filter/3.jpg",
     "test/media/filter/4.jpg",
+    "test/media/filter/10.jpg",
 ]
 
 def test_create_identity_lut ():
