@@ -29,7 +29,7 @@ def saturation (input: Tensor, weight: Tensor) -> Tensor:
 
     Parameters:
         input (Tensor): RGB image with shape (N,3,H,W) in range [-1., 1.].
-        weight (float | Tensor): Scalar weight in range [-1., 1.].
+        weight (float | Tensor): Scalar weight with shape (N,1) in range [-1., 1.].
 
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in range [-1., 1.].
@@ -52,7 +52,7 @@ def temperature (input: Tensor, weight: Tensor) -> Tensor:
 
     Parameters:
         input (Tensor): Input RGB image with shape (N,3,H,W) in range [-1., 1.].
-        weight (float | Tensor): Scalar weight in range [-1., 1.].
+        weight (float | Tensor): Scalar weight with shape (N,1) in range [-1., 1.].
 
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in range [-1., 1.].
@@ -75,7 +75,7 @@ def tint (input: Tensor, weight: Tensor) -> Tensor:
 
     Parameters:
         input (Tensor): Input RGB image with shape (N,3,H,W) in range [-1., 1.].
-        weight (float | Tensor): Scalar weight in range [-1., 1.].
+        weight (float | Tensor): Scalar weight with shape (N,1) in range [-1., 1.].
 
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in range [-1., 1.].
