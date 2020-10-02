@@ -3,8 +3,8 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
-from numpy import linspace
 from pytest import fixture, mark
+from torch import linspace
 from .common import tensorread, tensorwrite
 
 from plasma.filters import contrast, clarity, exposure, highlights, saturation, shadows, sharpen, temperature, texture, tint
@@ -31,8 +31,9 @@ def test_clarity (image_path):
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_contrast (image_path):
     image = tensorread(image_path)
-    results = [contrast(image, weight) for weight in linspace(-1., 1., 20)]
-    tensorwrite("contrast.gif", *results)
+    weights = linspace(-1., 1., 20).unsqueeze(dim=1)
+    result = contrast(image, weights)
+    tensorwrite("contrast.gif", *result.split(1, dim=0))
 
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_exposure (image_path):
@@ -49,8 +50,9 @@ def test_highlights (image_path):
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_saturation (image_path):
     image = tensorread(image_path)
-    results = [saturation(image, weight) for weight in linspace(-1., 1., 20)]
-    tensorwrite("saturation.gif", *results)
+    weights = linspace(-1., 1., 20).unsqueeze(dim=1)
+    result = saturation(image, weights)
+    tensorwrite("saturation.gif", *result.split(1, dim=0))
 
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_shadows (image_path):
@@ -75,8 +77,9 @@ def test_sharpen (image_path):
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_temperature (image_path):
     image = tensorread(image_path)
-    results = [temperature(image, weight) for weight in linspace(-1., 1., 20)]
-    tensorwrite("temperature.gif", *results)
+    weights = linspace(-1., 1., 20).unsqueeze(dim=1)
+    result = temperature(image, weights)
+    tensorwrite("temperature.gif", *result.split(1, dim=0))
 
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_texture (image_path):
@@ -87,5 +90,6 @@ def test_texture (image_path):
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_tint (image_path):
     image = tensorread(image_path)
-    results = [tint(image, weight) for weight in linspace(-1., 1., 20)]
-    tensorwrite("tint.gif", *results)
+    weights = linspace(-1., 1., 20).unsqueeze(dim=1)
+    result = tint(image, weights)
+    tensorwrite("tint.gif", *result.split(1, dim=0))
