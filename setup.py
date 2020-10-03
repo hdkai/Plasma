@@ -15,6 +15,7 @@ with open("plasma/version.py") as version_source:
     exec(version_source.read(), gvars)
     version = gvars["__version__"]
 
+# Setup
 setup(
     name="plasma",
     version=version,
