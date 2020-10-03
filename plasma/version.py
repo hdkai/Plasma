@@ -3,4 +3,4 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
-from .version import __version__
+__version__ = "0.0.17"

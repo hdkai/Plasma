@@ -15,7 +15,7 @@ def radial_gradient (input: Tensor, radius: Tensor) -> Tensor:
 
     Parameters:
         input (Tensor): Input image with shape (N,C,H,W) in range [-1., 1.].
-        radius (float | Tensor): Normalized radius in range [0., 1.].
+        radius (Tensor | float): Normalized radius with shape (N,1) in range [0., 1.].
 
     Returns:
         Tensor: Gradient mask with shape (N,1,H,W) in range [0., 1.].
@@ -26,8 +26,9 @@ def radial_gradient (input: Tensor, radius: Tensor) -> Tensor:
     hg = hg.repeat(samples, 1, 1, 1).to(input.device)
     wg = wg.repeat(samples, 1, 1, 1).to(input.device)
     field = cat([hg, wg], dim=1)
-    field = field.norm(dim=1, p=2, keepdim=True) / radius
-    field = field.clamp(max=1.)
+    field = field.norm(dim=1, p=2, keepdim=True)
+    field = field.flatten(start_dim=1) / radius
+    field = field.view(-1, 1, extent, extent).clamp(max=1.)
     mask = 2 * field.abs().pow(3) - 3 * field.abs().pow(2) + 1
     mask = interpolate(mask, size=(height, width), mode="bilinear", align_corners=False)
     return mask
@@ -40,7 +41,7 @@ def top_bottom_gradient (input: Tensor, length: Tensor):
 
     Parameters:
         input (Tensor): Input image with shape (N,C,H,W) in range [-1., 1.].
-        length (float | Tensor): Normalized length in range [0., 1.].
+        length (Tensor | float): Normalized length with shape (N,1) in range [0., 1.].
 
     Returns:
         Tensor: Gradient mask with shape (N,1,H,W) in range [0., 1.].
@@ -48,7 +49,9 @@ def top_bottom_gradient (input: Tensor, length: Tensor):
     samples, _, height, width = input.shape
     field = linspace(0., 1., height).to(input.device)
     field = field.repeat(samples, 1, width, 1).permute(0, 1, 3, 2).contiguous()
-    field = 1. - (field / length).clamp(max=1.)
+    field = field.flatten(start_dim=1) / length
+    field = field.view(-1, 1, height, width).clamp(max=1.)
+    field = 1. - field
     return field
 
 def bottom_top_gradient (input: Tensor, length: Tensor) -> Tensor:
@@ -59,7 +62,7 @@ def bottom_top_gradient (input: Tensor, length: Tensor) -> Tensor:
 
     Parameters:
         input (Tensor): Input image with shape (N,C,H,W) in range [-1., 1.].
-        length (float | Tensor): Normalized length in range [0., 1.].
+        length (Tensor | float): Normalized length with shape (N,1) in range [0., 1.].
 
     Returns:
         Tensor: Gradient mask with shape (N,1,H,W) in range [0., 1.].
@@ -67,7 +70,9 @@ def bottom_top_gradient (input: Tensor, length: Tensor) -> Tensor:
     samples, _, height, width = input.shape
     field = linspace(1., 0., height).to(input.device)
     field = field.repeat(samples, 1, width, 1).permute(0, 1, 3, 2).contiguous()
-    field = 1. - (field / length).clamp(max=1.)
+    field = field.flatten(start_dim=1) / length
+    field = field.view(-1, 1, height, width).clamp(max=1.)
+    field = 1. - field
     return field
 
 def left_right_gradient (input: Tensor, length: Tensor) -> Tensor:
@@ -78,7 +83,7 @@ def left_right_gradient (input: Tensor, length: Tensor) -> Tensor:
 
     Parameters:
         input (Tensor): Input image with shape (N,C,H,W) in range [-1., 1.].
-        length (float | Tensor): Normalized length in range [0., 1.].
+        length (Tensor | float): Normalized length with shape (N,1) in range [0., 1.].
 
     Returns:
         Tensor: Gradient mask with shape (N,1,H,W) in range [0., 1.].
@@ -86,7 +91,9 @@ def left_right_gradient (input: Tensor, length: Tensor) -> Tensor:
     samples, _, height, width = input.shape
     field = linspace(0., 1., width).to(input.device)
     field = field.repeat(samples, 1, height, 1)
-    field = 1. - (field / length).clamp(max=1.)
+    field = field.flatten(start_dim=1) / length
+    field = field.view(-1, 1, height, width).clamp(max=1.)
+    field = 1. - field
     return field
 
 def right_left_gradient (input: Tensor, length: Tensor) -> Tensor:
@@ -97,7 +104,7 @@ def right_left_gradient (input: Tensor, length: Tensor) -> Tensor:
 
     Parameters:
         input (Tensor): Input image with shape (N,C,H,W) in range [-1., 1.].
-        length (float | Tensor): Normalized length in range [0., 1.].
+        length (Tensor | float): Normalized length in range [0., 1.].
 
     Returns:
         Tensor: Gradient mask with shape (N,1,H,W) in range [0., 1.].
@@ -105,5 +112,7 @@ def right_left_gradient (input: Tensor, length: Tensor) -> Tensor:
     samples, _, height, width = input.shape
     field = linspace(1., 0., width).to(input.device)
     field = field.repeat(samples, 1, height, 1)
-    field = 1. - (field / length).clamp(max=1.)
+    field = field.flatten(start_dim=1) / length
+    field = field.view(-1, 1, height, width).clamp(max=1.)
+    field = 1. - field
     return field

@@ -73,7 +73,7 @@ def slice_bilateral_grid (input: Tensor, guide: Tensor, homogenous: bool=False) 
 
     Parameters:
         input (Tensor): Input bilateral grid with shape (N,D,I,Sy,Sx).
-        guide (Tensor): Slicing guide map with shape (N,1,H,W) in [-1., 1.].
+        guide (Tensor): Slicing guide map with shape (N,1,H,W) in range [-1., 1.].
         homogenous (bool): Whether a homogenous divide is to be performed. The last channel is assumed to be the homogenous coordinate.
 
     Returns:

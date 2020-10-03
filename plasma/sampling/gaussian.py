@@ -38,10 +38,13 @@ def gaussian_blur_2d (input: Tensor, kernel_size: Tuple[int, int]) -> Tensor:
         Tensor: Filtered image with shape (N,C,H,W).
     """
     _,channels,_,_ = input.shape
-    # Build kernels
     kernel_size_y, kernel_size_x = kernel_size
-    kernel_x = gaussian_kernel_1d(kernel_size_x).expand(channels, 1, 1, -1).to(input.device)
-    kernel_y = gaussian_kernel_1d(kernel_size_x).expand(channels, 1, 1, -1).permute(0, 1, 3, 2).to(input.device)
+    # Compute kernels
+    kernel_x = gaussian_kernel_1d(kernel_size_x).to(input.device)
+    kernel_y = gaussian_kernel_1d(kernel_size_y).to(input.device)
+    # Reshape
+    kernel_x = kernel_x.expand(channels, 1, 1, -1)
+    kernel_y = kernel_y.expand(channels, 1, 1, -1).permute(0, 1, 3, 2).contiguous()
     # Seperable convolution
     result = conv2d(input, kernel_x, padding=(0, kernel_size_x // 2), groups=channels)
     result = conv2d(result, kernel_y, padding=(kernel_size_y // 2, 0), groups=channels)
@@ -57,14 +60,18 @@ def gaussian_blur_3d (input: Tensor, kernel_size: Tuple[int, int, int]) -> Tenso
         kernel_size (tuple): Kernel size in each dimension (Kz,Ky,Kx).
 
     Returns:
-        Tensor: Filtered image with shape (N,C,H,W).
+        Tensor: Filtered volume with shape (N,C,D,H,W).
     """
     _,channels,_,_,_ = input.shape
-    # Build kernels
     kernel_size_z, kernel_size_y, kernel_size_x = kernel_size
-    kernel_x = gaussian_kernel_1d(kernel_size_x).expand(channels, 1, 1, 1, -1).to(input.device)
-    kernel_y = gaussian_kernel_1d(kernel_size_y).expand(channels, 1, 1, 1, -1).permute(0, 1, 2, 4, 3).to(input.device)
-    kernel_z = gaussian_kernel_1d(kernel_size_z).expand(channels, 1, 1, 1, -1).permute(0, 1, 4, 2, 3).to(input.device)
+    # Compute kernels
+    kernel_x = gaussian_kernel_1d(kernel_size_x).to(input.device)
+    kernel_y = gaussian_kernel_1d(kernel_size_y).to(input.device)
+    kernel_z = gaussian_kernel_1d(kernel_size_z).to(input.device)
+    # Reshape
+    kernel_x = kernel_x.expand(channels, 1, 1, 1, -1)
+    kernel_y = kernel_y.expand(channels, 1, 1, 1, -1).permute(0, 1, 2, 4, 3).contiguous()
+    kernel_z = kernel_z.expand(channels, 1, 1, 1, -1).permute(0, 1, 4, 2, 3).contiguous()
     # Seperable convolution
     result = conv3d(input, kernel_x, padding=(0, 0, kernel_size_x // 2), groups=channels)
     result = conv3d(result, kernel_y, padding=(0, kernel_size_y // 2, 0), groups=channels)
@@ -97,8 +104,8 @@ def laplacian_of_gaussian_2d (input: Tensor) -> Tensor:
         [1., 1., 1., 1., 1.],
         [1., 1., 1., 1., 1.]
     ])
-    gaussian_kernel = gaussian_kernel.view(1, 1, 5, 5).repeat(channels, 1, 1, 1)
-    laplacian_kernel = laplacian_kernel.view(1, 1, 5, 5).repeat(channels, 1, 1, 1)
+    gaussian_kernel = gaussian_kernel.view(1, 1, 5, 5).repeat(channels, 1, 1, 1).to(input.device)
+    laplacian_kernel = laplacian_kernel.view(1, 1, 5, 5).repeat(channels, 1, 1, 1).to(input.device)
     # Apply Gaussian
     gaussian = pad(input, (2, 2, 2, 2), mode="reflect")
     gaussian = conv2d(gaussian, gaussian_kernel, groups=channels)
