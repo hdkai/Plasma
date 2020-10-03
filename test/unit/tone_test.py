@@ -59,7 +59,7 @@ def test_tone_curve_contrast_control (image_path):
     tensorwrite("tone_contrast.gif", *results)
 
 @mark.parametrize("image_path", IMAGE_PATHS)
-def test_tonal_exposure (image_path):
+def test_exposure (image_path):
     image = tensorread(image_path)
     result = exposure(image, -1.)
     tensorwrite("exposure.jpg", result)

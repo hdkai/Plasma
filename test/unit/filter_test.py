@@ -25,54 +25,51 @@ IMAGE_PATHS = [
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_clarity (image_path):
     image = tensorread(image_path)
-    results = [clarity(image, weight) for weight in linspace(-1., 1., 20)]
-    tensorwrite("clarity.gif", *results)
+    weights = linspace(-1., 1., 20).unsqueeze(dim=1)
+    results = clarity(image, weights)
+    tensorwrite("clarity.gif", *results.split(1, dim=0))
 
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_contrast (image_path):
     image = tensorread(image_path)
     weights = linspace(-1., 1., 20).unsqueeze(dim=1)
-    result = contrast(image, weights)
-    tensorwrite("contrast.gif", *result.split(1, dim=0))
-
-@mark.parametrize("image_path", IMAGE_PATHS)
-def test_exposure (image_path):
-    image = tensorread(image_path)
-    results = [exposure(image, weight) for weight in linspace(-1., 1., 20)]
-    tensorwrite("exposure.gif", *results)
+    results = contrast(image, weights)
+    tensorwrite("contrast.gif", *results.split(1, dim=0))
 
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_highlights (image_path):
     image = tensorread(image_path)
-    results = [highlights(image, weight) for weight in linspace(-1., 1., 20)]
-    tensorwrite("highlights.gif", *results)
+    weights = linspace(-1., 1., 20).unsqueeze(dim=1)
+    results = highlights(image, weights)
+    tensorwrite("highlights.gif", *results.split(1, dim=0))
 
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_saturation (image_path):
     image = tensorread(image_path)
     weights = linspace(-1., 1., 20).unsqueeze(dim=1)
-    result = saturation(image, weights)
-    tensorwrite("saturation.gif", *result.split(1, dim=0))
+    results = saturation(image, weights)
+    tensorwrite("saturation.gif", *results.split(1, dim=0))
 
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_shadows (image_path):
     image = tensorread(image_path)
-    results = [shadows(image, weight) for weight in linspace(-1., 1., 20)]
-    tensorwrite("shadows.gif", *results)
+    weights = linspace(-1., 1., 20).unsqueeze(dim=1)
+    results = shadows(image, weights)
+    tensorwrite("shadows.gif", *results.split(1, dim=0))
 
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_shadows_highlights (image_path):
     image = tensorread(image_path, size=None)
-    result = image
-    result = highlights(result, -0.9)
+    result = highlights(image, -0.9)
     result = shadows(result, 0.75)
     tensorwrite("shadhi.jpg", result)
 
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_sharpen (image_path):
     image = tensorread(image_path)
-    results = [sharpen(image, weight) for weight in linspace(-1., 1., 20)]
-    tensorwrite("sharpen.gif", *results)
+    weights = linspace(-1., 1., 20).unsqueeze(dim=1)
+    results = sharpen(image, weights)
+    tensorwrite("sharpen.gif", *results.split(1, dim=0))
 
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_temperature (image_path):
@@ -84,8 +81,9 @@ def test_temperature (image_path):
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_texture (image_path):
     image = tensorread(image_path)
-    results = [texture(image, weight) for weight in linspace(-1., 1., 20)]
-    tensorwrite("texture.gif", *results)
+    weights = linspace(-1., 1., 20).unsqueeze(dim=1)
+    results = texture(image, weights)
+    tensorwrite("texture.gif", *results.split(1, dim=0))
 
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_tint (image_path):
