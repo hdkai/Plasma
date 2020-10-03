@@ -4,7 +4,7 @@
 #
 
 from pytest import fixture, mark
-from torch import cat, split, stack, tensor, tensor, zeros
+from torch import cat, linspace, stack, tensor, zeros, zeros_like
 from .common import tensorread, tensorwrite
 
 from plasma.filters import selective_color
@@ -48,40 +48,41 @@ def lr_bases ():
 def test_selective_weight (path, lr_bases):
     image = tensorread(path)
     weight_map = selective._selective_color_weight_map(image, lr_bases)
-    weights = split(weight_map, 1, dim=1)
+    weights = weight_map.split(1, dim=1)
     names = ["red", "orange", "green", "cyan", "blue", "violet"]
     for weight, name in zip(weights, names):
         tensorwrite(f"{name}.jpg", weight)
 
 @mark.parametrize("image_path", IMAGE_PATHS)
-def test_selective_hue (image_path, red_green_basis):
+def test_selective_color (image_path, red_green_basis):
     image = tensorread(image_path)
-    _, _, height, width = image.shape
-    zero_weight = zeros(1, 2, height, width)
-    hue_weight = zeros(1, 2, height, width)
-    hue_weight[:,0,:,:] -= 0.7
-    hue_weight[:,1:,:] += 0.9
-    result = selective_color(image, red_green_basis, hue_weight, zero_weight, zero_weight)
-    tensorwrite("selective_hue.jpg", result)
+    weight = tensor([[
+        [0.2, 0., 0.], # red
+        [0., -0.8, 0.] # green
+    ]])
+    result = selective_color(image, red_green_basis, weight)
+    tensorwrite("selective_color.jpg", result)
 
 @mark.parametrize("image_path", IMAGE_PATHS)
-def test_selective_saturation (image_path, red_green_basis):
+def test_selective_hue (image_path, red_basis):
     image = tensorread(image_path)
-    _, _, height, width = image.shape
-    zero_weight = zeros(1, 1, height, width)
-    others = zeros(1, 2, height, width)
-    sat_weight = cat([
-        zero_weight - 0.7,
-        zero_weight + 0.5
-    ], dim=1)
-    result = selective_color(image, red_green_basis, others, sat_weight, others)
-    tensorwrite("selective_sat.jpg", result)
+    weight = linspace(-1., 1., 20).unsqueeze(dim=1)
+    weight = stack([ weight, zeros_like(weight), zeros_like(weight) ], dim=2)
+    result = selective_color(image, red_basis, weight)
+    tensorwrite("selective_hue.gif", *result.split(1, dim=0))
 
 @mark.parametrize("image_path", IMAGE_PATHS)
-def test_selective_exposure (image_path, red_basis):
+def test_selective_saturation (image_path, red_basis):
     image = tensorread(image_path)
-    _, _, height, width = image.shape
-    zero_weight = zeros(1, 1, height, width)
-    exp_weight = zero_weight - 0.5
-    result = selective_color(image, red_basis, zero_weight, zero_weight, exp_weight)
-    tensorwrite("selective_exp.jpg", result)
+    weight = linspace(-1., 1., 20).unsqueeze(dim=1)
+    weight = stack([ zeros_like(weight), weight, zeros_like(weight) ], dim=2)
+    result = selective_color(image, red_basis, weight)
+    tensorwrite("selective_sat.gif", *result.split(1, dim=0))
+
+@mark.parametrize("image_path", IMAGE_PATHS)
+def test_selective_luminance (image_path, red_basis):
+    image = tensorread(image_path)
+    weight = linspace(-1., 1., 20).unsqueeze(dim=1)
+    weight = stack([ zeros_like(weight), zeros_like(weight), weight ], dim=2)
+    result = selective_color(image, red_basis, weight)
+    tensorwrite("selective_lum.gif", *result.split(1, dim=0))
