@@ -21,7 +21,6 @@ def tca_correction (*images: Image.Image) -> Image.Image:
 
     Parameters:
         images (PIL.Image | list): Input image(s).
-        coefficients (Tensor): Cubic red-blue TCA coefficients with shape (2,4). If `None`, it will be computed (can be slow).
     
     Returns:
         PIL.Image | list: Corrected image(s).
@@ -127,9 +126,9 @@ def _find_corners (input: ndarray, count: int=100) -> ndarray:
         ndarray: Coordinates of corners with shape (N,2).
     """
     # Find corners in green channel
-    r, g, b = split(input, 3, axis=2)
+    _, g, _ = split(input, 3, axis=2)
     corners = cornerHarris(g.astype(float32), 2, 3, 0.04)
-    # Get coordinates
+    # Get coordinates with max response
     corner_indices = argpartition(corners, -count, axis=None)[-count:]
     y_coords, x_coords = unravel_index(corner_indices, corners.shape)
     # Return
