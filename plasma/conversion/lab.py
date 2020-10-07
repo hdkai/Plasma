@@ -20,7 +20,7 @@ def xyz_to_lab (input: Tensor):
     # Constants
     eps = 216. / 24389.
     k = 24389. / 27.
-    d65 = tensor([0.95047, 1., 1.08883]).to(input.device)
+    d65 = tensor([0.95047, 1., 1.08883]).float().to(input.device)
     # Reference white
     d65_xyz_colors = diag(1. / d65).matmul(input.flatten(start_dim=2)).clamp(min=1e-4) # prevent NaN
     d65_xyz = d65_xyz_colors.view_as(input).clamp(min=1e-4)
@@ -47,7 +47,7 @@ def lab_to_xyz (input: Tensor):
     eps = 216. / 24389.
     eps_1_3 = eps ** (1. / 3.)
     k = 24389. / 27.
-    d65 = tensor([0.95047, 1., 1.08883]).to(input.device)
+    d65 = tensor([0.95047, 1., 1.08883]).float().to(input.device)
     # Convert
     l, a, b = input.split(1, dim=1)
     f_y = (l + 16.) / 116.
