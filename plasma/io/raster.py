@@ -5,8 +5,6 @@
 
 from pathlib import Path
 from PIL import Image
-from rawpy import imread as rawread, DemosaicAlgorithm, HighlightMode, Params
-from rawpy.enhance import find_bad_pixels, repair_bad_pixels
 from typing import List
 
 def imread (*image_paths: str) -> Image.Image:
