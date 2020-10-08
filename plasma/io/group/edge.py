@@ -10,7 +10,7 @@ from typing import Iterable, List, Tuple
 
 from .common import exposure_timestamp, load_exposure, normalize_exposures
 
-def group_exposures_by_edges (exposure_paths: List[str], min_similarity=0.35, workers=8) -> List[List[str]]:
+def edge_group (exposure_paths: List[str], min_similarity=0.35, workers=8) -> List[List[str]]:
     """
     Group a set of exposures by their mutual edges.
 

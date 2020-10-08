@@ -11,7 +11,7 @@ from typing import List
 
 from .common import exposure_timestamp, load_exposure, normalize_exposures
 
-def group_exposures_by_features (exposure_paths: List[str], workers=8) -> List[List[str]]:
+def feature_group (exposure_paths: List[str], workers=8) -> List[List[str]]:
     """
     Group a set of exposures by their visual features.
 

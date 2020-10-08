@@ -9,7 +9,7 @@ from typing import List
 
 from .common import exposure_timestamp
 
-def group_exposures_by_timestamp (exposure_paths: List[str], max_delta=8.) -> List[List[str]]:
+def timestamp_group (exposure_paths: List[str], max_delta=4.) -> List[List[str]]:
     """
     Group a set of exposures by their visual features.
 
