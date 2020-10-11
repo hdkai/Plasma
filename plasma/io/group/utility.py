@@ -3,50 +3,34 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
-from cv2 import cvtColor, imdecode, imread, resize, COLOR_RGB2GRAY, INTER_AREA
 from dateutil.parser import parse as parse_datetime
 from exifread import process_file
-from numpy import float64, frombuffer, interp, ndarray, uint8, unique
+from io import BytesIO
+from PIL import Image
+from numpy import asarray, float64, interp, ndarray, uint8, unique
 from rawpy import imread as rawread, HighlightMode, Params, ThumbFormat
 from typing import Tuple
 
 from ..raster import is_raster_format
 from ..raw import is_raw_format
 
-def exposure_timestamp (path: str) -> float:
-    """
-    Get the exposure timestamp from its EXIF metadata.
-    If the required EXIF dictionary or tag is not present, -1 will be returned.
-    
-    Parameters:
-        path (str): Path to exposure.
-    
-    Returns:
-        float: Image timestamp.
-    """
-    DATETIME_ORIGINAL = "EXIF DateTimeOriginal"
-    with open(path, "rb") as file:
-        tags = process_file(file, stop_tag=DATETIME_ORIGINAL, details=False)
-    time = tags.get(DATETIME_ORIGINAL)
-    return parse_datetime(str(time)).timestamp() if time is not None else -1
-
-def load_exposure (image_path: str, size=512) -> ndarray:
+def load_exposure (image_path: str) -> Image.Image: # INCOMPLETE # RAW metadata # Without this RAW's will never be grouped
     """
     Load an exposure into memory.
 
     For RAW files, this function will try to load the thumbnail.
-    But if no thumbnail is available, the RAW is fully demosaiced.
+    If no thumbnail is available, the RAW is fully demosaiced.
+    All metadata is loaded with the file if present.
     
     Parameters:
         image_path (str): Path to exposure.
-        size (int): Image size.
     
     Returns:
-        ndarray: Loaded exposure.
+        PIL.Image: Loaded exposure.
     """
     # If raster format, load directly
     if is_raster_format(image_path):
-        image = imread(image_path, 0)
+        image = Image.open(image_path)
     # If RAW, check for thumbnail
     elif is_raw_format(image_path):
         with rawread(image_path) as raw:
@@ -54,10 +38,10 @@ def load_exposure (image_path: str, size=512) -> ndarray:
             try:
                 thumb = raw.extract_thumb()
                 if thumb.format == ThumbFormat.JPEG:
-                    image_data = frombuffer(thumb.data, dtype=uint8)
-                    image = imdecode(image_data, 0)
+                    thumb_data = BytesIO(thumb.data)
+                    image = Image.open(thumb_data)
                 elif thumb.format == ThumbFormat.BITMAP:
-                    image = cvtColor(thumb.data, COLOR_RGB2GRAY)
+                    image = Image.fromarray(thumb.data)
             # Demosaic RAW
             except:
                 params = Params(
@@ -65,32 +49,46 @@ def load_exposure (image_path: str, size=512) -> ndarray:
                     use_camera_wb=True,
                     no_auto_bright=True,
                     output_bps=8,
-                    user_sat=9000,
+                    user_sat=11000,
                     exp_shift=1.,
                     exp_preserve_highlights=1.,
                     highlight_mode=HighlightMode.Clip,
                 )
                 image = raw.postprocess(params=params)
-                image = cvtColor(image, COLOR_RGB2GRAY)
-    # Downsample
-    image = resize(image, (size, size), interpolation=INTER_AREA)
+                image = Image.fromarray(image)
+        # Append metadata
+        # INCOMPLETE
     return image
 
-def normalize_exposures (image_a, image_b) -> Tuple[ndarray, ndarray]:
+def normalize_exposures (image_a: Image.Image, image_b: Image.Image) -> Tuple[Image.Image, Image.Image]:
     """
     Normalize two exposures to have similar histograms.
+
+    This method preserves metadata on the output images.
     
     Parameters:
-        image_a (ndarray): First image.
-        image_b (ndarray): Second image.
+        image_a (PIL.Image): First image.
+        image_b (PIL.Image): Second image.
     
     Returns:
         tuple: Normalized exposures.
     """
-    std_a, std_b = image_a.std(), image_b.std()
-    input, target = (image_a, image_b) if std_a < std_b else (image_b, image_a)
+    # Convert to array
+    image_a_arr = asarray(image_a)
+    image_b_arr = asarray(image_b)
+    image_a_meta = image_a.info.get("exif")
+    image_b_meta = image_b.info.get("exif")
+    # Match histograms
+    std_a = image_a_arr.std()
+    std_b = image_b_arr.std()
+    input, target = (image_a_arr, image_b_arr) if std_a < std_b else (image_b_arr, image_a_arr)
     matched = _match_histogram(input, target)
-    return matched, target
+    result_a = Image.fromarray(matched)
+    result_b = Image.fromarray(target)
+    # Apply metadata
+    result_a.info["exif"] = image_a_meta if std_a < std_b else image_b_meta
+    result_b.info["exif"] = image_b_meta if std_a < std_b else image_a_meta
+    return result_a, result_b
 
 def _match_histogram (input: ndarray, target: ndarray) -> ndarray:
     """

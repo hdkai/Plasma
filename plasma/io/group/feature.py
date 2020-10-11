@@ -5,75 +5,45 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from cv2 import DescriptorMatcher_create, findHomography, ORB_create, DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING, RANSAC
-from numpy import array, ndarray, sqrt
+from numpy import array, asarray, ndarray, sqrt
 from numpy.linalg import eig
-from typing import List
+from PIL import Image
+from typing import Callable, List
 
-from .common import exposure_timestamp, load_exposure, normalize_exposures
+from .utility import normalize_exposures
 
-def feature_group (exposure_paths: List[str], workers=8) -> List[List[str]]:
+def feature_similarity (max_cost: float=1e-3) -> Callable[[Image.Image, Image.Image], bool]:
     """
-    Group a set of exposures by their visual features.
+    Create a feature-based similarity function.
 
     Parameters:
-        exposure_paths (list): Paths to exposures to group.
-        workers (int): Number of workers for IO.
-    
-    Returns:
-        list: Groups of exposure paths.
-    """
-    # Check
-    if not exposure_paths:
-        return []
-    # Trivial case
-    if len(exposure_paths) == 1:
-        return [exposure_paths]
-    # Sort by EXIF timestamp
-    exposure_paths = sorted(exposure_paths, key=lambda path: exposure_timestamp(path))
-    # Load all exposures into memory, thread this, `map` preserves order
-    with ThreadPoolExecutor(max_workers=workers) as executor:
-        exposures = executor.map(lambda path: load_exposure(path, 2048), exposure_paths)
-        exposures = list(exposures) # consume immediately
-        bounds = executor.map(lambda pair: _images_aligned(*pair), [(exposures[i], exposures[i+1]) for i in range(len(exposures) - 1)])
-    # Group
-    groups = []
-    current_group = [exposure_paths[0]]
-    for i, same_group in enumerate(bounds):
-        if not same_group:
-            groups.append(current_group)
-            current_group = []
-        current_group.append(exposure_paths[i+1])
-    groups.append(current_group)
-    return groups
-
-def _images_aligned (image_a: ndarray, image_b: ndarray) -> bool:
-    """
-    Check if two exposures are aligned.
-
-    Parameters:
-        image_a (ndarray): First image.
-        image_b (ndarray): Second image.
+        max_cost (float). Maximum alignment cost for images to be considered similar.
 
     Returns:
-        bool: Whether both images are aligned.
+        callable: Pairwise similarity function returning a boolean.
     """
-    keypoints_a, keypoints_b, matches = _compute_matches(image_a, image_b)
-    coefficient = _compute_alignment_coefficient(keypoints_a, keypoints_b, matches)
-    return coefficient < 1e-3
+    def similarity_fn (image_a: Image.Image, image_b: Image.Image) -> bool:
+        # Compute matches
+        image_a, image_b = normalize_exposures(image_a, image_b)
+        keypoints_a, keypoints_b, matches = _compute_matches(image_a, image_b)
+        # Compute alignment cost
+        cost = _compute_alignment_cost(keypoints_a, keypoints_b, matches)
+        return cost <= max_cost
+    return similarity_fn
 
-def _compute_matches (image_a: ndarray, image_b: ndarray):
+def _compute_matches (image_a: Image.Image, image_b: Image.Image):
     """
     Compute feature matches between two images.
 
     Parameters:
-        image_a (ndarray): First image.
-        image_b (ndarray): Second image.
+        image_a (PIL.Image): First image.
+        image_b (PIL.Image): Second image.
 
     Returns:
         tuple: Keypoints from first image, keypoints from second image, and matches between them.
     """
     # Normalize
-    image_a, image_b = normalize_exposures(image_a, image_b)
+    image_a, image_b = asarray(image_a), asarray(image_b)
     # Detect features
     orb = ORB_create(1000)
     keypoints_a, descriptors_a = orb.detectAndCompute(image_a, None)
@@ -87,9 +57,9 @@ def _compute_matches (image_a: ndarray, image_b: ndarray):
     # Return
     return keypoints_a, keypoints_b, matches
 
-def _compute_alignment_coefficient (keypoints_a: ndarray, keypoints_b: ndarray, matches: ndarray) -> float:
+def _compute_alignment_cost (keypoints_a: ndarray, keypoints_b: ndarray, matches: ndarray) -> float:
     """
-    Compute the alignment coefficient between two keypoints.
+    Compute the alignment cost between two sets of keypoints.
 
     Parameters:
         keypoints_a (ndarray): First set of keypoints.
@@ -97,15 +67,15 @@ def _compute_alignment_coefficient (keypoints_a: ndarray, keypoints_b: ndarray, 
         matches (ndarray): Matches between keypoints.
 
     Returns:
-        float: Alignment coefficient.
+        float: Alignment cost.
     """
     # Compute homography
     points_a = array([keypoints_a[match.queryIdx].pt for match in matches])
     points_b = array([keypoints_b[match.trainIdx].pt for match in matches])
-    H, _ = findHomography(points_a, points_b, RANSAC) # RANSAC
-    # Compute alignment coefficient
+    H, _ = findHomography(points_a, points_b, RANSAC)
+    # Compute alignment cost
     singular_values, _ = eig(H.T * H)
     induced_norm = sqrt(singular_values.max())
-    coefficient = abs(induced_norm - 1.)
+    cost = abs(induced_norm - 1.)
     # Return
-    return coefficient
+    return cost
