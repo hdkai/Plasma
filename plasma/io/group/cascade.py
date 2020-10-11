@@ -19,6 +19,9 @@ def cascade_similarity (*similarity_fns) -> Callable[[Image.Image, Image.Image],
     Returns:
         callable: Pairwise similarity function returning a boolean.
     """
-    def similarity_fn (image_a: Image.Image, image_b: Image.Image) -> bool:
-        return any([fn(image_a, image_b) for fn in similarity_fns])
+    def similarity_fn (image_a: Image.Image, image_b: Image.Image) -> bool: # Don't use `any` for performance
+        for fn in similarity_fns:
+            if fn(image_a, image_b):
+                return True
+        return False
     return similarity_fn
