@@ -3,6 +3,9 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
-from .edge import edge_group
-from .feature import feature_group
-from .timestamp import timestamp_group
+from .group import group_exposures
+
+from .cascade import cascade_similarity
+from .edge import edge_similarity
+from .feature import feature_similarity
+from .timestamp import timestamp_similarity
