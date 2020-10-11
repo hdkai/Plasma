@@ -3,7 +3,7 @@
 #   Copyright (c) 2020 Homedeck, LLC.
 #
 
-from cv2 import Canny, GaussianBlur
+from cv2 import Canny, GaussianBlur, resize, INTER_AREA
 from PIL import Image
 from numpy import asarray, ndarray
 from typing import Callable
@@ -21,6 +21,11 @@ def edge_similarity (min_similarity: float=0.35) -> Callable[[Image.Image, Image
         callable: Pairwise similarity function returning a boolean.
     """
     def similarity_fn (image_a: Image.Image, image_b: Image.Image) -> bool:
+        # Downsample
+        MIN_DIM = 1024
+        scale = max(MIN_DIM / image_a.width, MIN_DIM / image_a.height)
+        image_a = resize(asarray(image_a), (0, 0), fx=scale, fy=scale, interpolation=INTER_AREA)
+        image_b = resize(asarray(image_b), (0, 0), fx=scale, fy=scale, interpolation=INTER_AREA)
         # Compute edge intersection
         image_a, image_b = normalize_exposures(image_a, image_b)
         edges_a, edges_b = _extract_edges(image_a), _extract_edges(image_b)
@@ -42,7 +47,6 @@ def _extract_edges (image: Image.Image) -> ndarray:
     Returns:
         ndarray: Edge bitmap.
     """
-    image = asarray(image)
     image = GaussianBlur(image, (5, 5), 0)
     edges = Canny(image, 50, 150)
     return edges
