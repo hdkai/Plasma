@@ -31,6 +31,7 @@ def group_exposures (exposure_paths: List[str], similarity_fn: Callable[[Image.I
     exposures = [Image.open(path) for path in exposure_paths]
     exposures_with_paths = zip(exposure_paths, exposures)
     exposures_with_paths = sorted(exposures_with_paths, key=lambda pair: exposure_timestamp(pair[1]))
+    print("loaded exposures")
     # Group
     current_path, current_exposure = exposures_with_paths.pop(0)
     groups = []

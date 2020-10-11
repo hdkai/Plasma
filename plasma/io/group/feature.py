@@ -4,7 +4,7 @@
 #
 
 from concurrent.futures import ThreadPoolExecutor
-from cv2 import DescriptorMatcher_create, findHomography, ORB_create, DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING, RANSAC
+from cv2 import DescriptorMatcher_create, findHomography, ORB_create, resize, DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING, INTER_AREA, RANSAC
 from numpy import array, asarray, ndarray, sqrt
 from numpy.linalg import eig
 from PIL import Image
@@ -24,6 +24,9 @@ def feature_similarity (max_cost: float=1e-3) -> Callable[[Image.Image, Image.Im
     """
     def similarity_fn (image_a: Image.Image, image_b: Image.Image) -> bool:
         # Compute matches
+        scale = max(1024 / image_a.width, 1024 / image_a.height)
+        image_a = resize(asarray(image_a), (0, 0), fx=scale, fy=scale, interpolation=INTER_AREA)
+        image_b = resize(asarray(image_b), (0, 0), fx=scale, fy=scale, interpolation=INTER_AREA)
         image_a, image_b = normalize_exposures(image_a, image_b)
         keypoints_a, keypoints_b, matches = _compute_matches(image_a, image_b)
         # Compute alignment cost
