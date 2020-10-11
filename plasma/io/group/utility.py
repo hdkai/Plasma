@@ -11,10 +11,11 @@ from numpy import asarray, float64, interp, ndarray, uint8, unique
 from rawpy import imread as rawread, HighlightMode, Params, ThumbFormat
 from typing import Tuple
 
+from ..metadata import exifread, exifwrite
 from ..raster import is_raster_format
 from ..raw import is_raw_format
 
-def load_exposure (image_path: str) -> Image.Image: # INCOMPLETE # RAW metadata # Without this RAW's will never be grouped
+def load_exposure (image_path: str) -> Image.Image:
     """
     Load an exposure into memory.
 
@@ -57,7 +58,8 @@ def load_exposure (image_path: str) -> Image.Image: # INCOMPLETE # RAW metadata 
                 image = raw.postprocess(params=params)
                 image = Image.fromarray(image)
         # Append metadata
-        # INCOMPLETE
+        metadata = exifread(image_path)
+        exifwrite(image, metadata)
     return image
 
 def normalize_exposures (image_a: Image.Image, image_b: Image.Image) -> Tuple[Image.Image, Image.Image]:
