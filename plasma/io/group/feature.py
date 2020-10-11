@@ -59,7 +59,7 @@ def _images_aligned (image_a: ndarray, image_b: ndarray) -> bool:
     """
     keypoints_a, keypoints_b, matches = _compute_matches(image_a, image_b)
     coefficient = _compute_alignment_coefficient(keypoints_a, keypoints_b, matches)
-    return coefficient < 1e-2
+    return coefficient < 1e-3
 
 def _compute_matches (image_a: ndarray, image_b: ndarray):
     """
@@ -102,7 +102,7 @@ def _compute_alignment_coefficient (keypoints_a: ndarray, keypoints_b: ndarray, 
     # Compute homography
     points_a = array([keypoints_a[match.queryIdx].pt for match in matches])
     points_b = array([keypoints_b[match.trainIdx].pt for match in matches])
-    H, _ = findHomography(points_a, points_b, RANSAC)
+    H, _ = findHomography(points_a, points_b, RANSAC) # RANSAC
     # Compute alignment coefficient
     singular_values, _ = eig(H.T * H)
     induced_norm = sqrt(singular_values.max())

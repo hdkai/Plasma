@@ -8,21 +8,21 @@ from imageio import imread, imwrite
 from pathlib import Path
 from pytest import fixture, mark
 
-from plasma.io import group_exposures_by_features
+from plasma.io.group import feature_group
 import plasma.io.group.feature as feature
 
 def test_single_image ():
     exposure_paths = [
         "test/media/group/1.jpg"
     ]
-    groups = group_exposures_by_features(exposure_paths)
+    groups = feature_group(exposure_paths)
     assert len(groups) == 1 and len(groups[0]) == 1
 
 def test_single_raw ():
     exposure_paths = [
         "test/media/raw/1.arw"
     ]
-    groups = group_exposures_by_features(exposure_paths)
+    groups = feature_group(exposure_paths)
     assert len(groups) == 1 and len(groups[0]) == 1
 
 def test_group_image ():
@@ -33,7 +33,7 @@ def test_group_image ():
         "test/media/group/4.jpg",
         "test/media/group/5.jpg",
     ]
-    groups = group_exposures_by_features(exposure_paths)
+    groups = feature_group(exposure_paths)
     assert len(groups) == 1 and len(groups[0]) == 5
 
 def test_flash_group_a ():
@@ -41,7 +41,7 @@ def test_flash_group_a ():
         "test/media/group/17.jpg",
         "test/media/group/18.jpg",
     ]
-    groups = group_exposures_by_features(exposure_paths)
+    groups = feature_group(exposure_paths)
     assert len(groups) == 1 and len(groups[0]) == 2
 
 def test_flash_group_b ():
@@ -50,7 +50,7 @@ def test_flash_group_b ():
         "test/media/group/12.jpg",
         "test/media/group/13.jpg",
     ]
-    groups = group_exposures_by_features(exposure_paths)
+    groups = feature_group(exposure_paths)
     assert len(groups) == 1 and len(groups[0]) == 3
 
 def test_aerial_group ():
@@ -62,12 +62,14 @@ def test_aerial_group ():
         "test/media/group/23.jpg",
         "test/media/group/24.jpg",
     ]
-    groups = group_exposures_by_features(exposure_paths)
+    groups = feature_group(exposure_paths)
     assert len(groups) == 2 and all([len(group) == 3 for group in groups])
 
 def test_visualize_matches ():
-    image_a = imread("test/media/group/23.jpg")
-    image_b = imread("test/media/group/24.jpg")
+    #exposure_paths = ["test/media/group/12.jpg", "test/media/group/13.jpg"]
+    #exposure_paths = ["test/media/group/23.jpg", "test/media/group/24.jpg"]
+    exposure_paths = ["/Users/yusuf/Desktop/Captain/6.JPG", "/Users/yusuf/Desktop/Captain/7.JPG"]
+    image_a, image_b = [imread(path) for path in exposure_paths]
     keypoints_a, keypoints_b, matches = feature._compute_matches(image_a, image_b)
     coefficient = feature._compute_alignment_coefficient(keypoints_a, keypoints_b, matches)
     match_image = drawMatches(image_a, keypoints_a, image_b, keypoints_b, matches, None)

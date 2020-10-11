@@ -6,20 +6,20 @@
 from pathlib import Path
 from pytest import fixture, mark
 
-from plasma.io import group_exposures_by_edges
+from plasma.io.group import edge_group
 
 def test_single_image ():
     exposure_paths = [
         "test/media/group/1.jpg"
     ]
-    groups = group_exposures_by_edges(exposure_paths)
+    groups = edge_group(exposure_paths)
     assert len(groups) == 1 and len(groups[0]) == 1
 
 def test_single_raw ():
     exposure_paths = [
         "test/media/raw/1.arw"
     ]
-    groups = group_exposures_by_edges(exposure_paths)
+    groups = edge_group(exposure_paths)
     assert len(groups) == 1 and len(groups[0]) == 1
 
 def test_group_image ():
@@ -30,7 +30,7 @@ def test_group_image ():
         "test/media/group/4.jpg",
         "test/media/group/5.jpg",
     ]
-    groups = group_exposures_by_edges(exposure_paths)
+    groups = edge_group(exposure_paths)
     assert len(groups) == 1 and len(groups[0]) == 5
 
 def test_group_raw ():
@@ -41,7 +41,7 @@ def test_group_raw ():
         "test/media/raw/4.arw",
         "test/media/raw/5.arw",
     ]
-    groups = group_exposures_by_edges(exposure_paths)
+    groups = edge_group(exposure_paths)
     assert len(groups) == 1 and len(groups[0]) == 5
 
 def test_flash_group_a ():
@@ -49,7 +49,7 @@ def test_flash_group_a ():
         "test/media/group/17.jpg",
         "test/media/group/18.jpg",
     ]
-    groups = group_exposures_by_edges(exposure_paths)
+    groups = edge_group(exposure_paths)
     assert len(groups) == 1 and len(groups[0]) == 2
 
 def test_flash_group_b ():
@@ -58,7 +58,7 @@ def test_flash_group_b ():
         "test/media/group/12.jpg",
         "test/media/group/13.jpg",
     ]
-    groups = group_exposures_by_edges(exposure_paths)
+    groups = edge_group(exposure_paths)
     assert len(groups) == 1 and len(groups[0]) == 3
 
 def test_aerial_group ():
@@ -70,7 +70,7 @@ def test_aerial_group ():
         "test/media/group/23.jpg",
         "test/media/group/24.jpg",
     ]
-    groups = group_exposures_by_edges(exposure_paths)
+    groups = edge_group(exposure_paths)
     assert len(groups) == 2 and all([len(group) == 3 for group in groups])
 
 def test_full_shoot ():

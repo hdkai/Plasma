@@ -9,13 +9,13 @@ from typing import List
 
 from .common import exposure_timestamp
 
-def timestamp_group (exposure_paths: List[str], max_delta=4.) -> List[List[str]]:
+def timestamp_group (exposure_paths: List[str], max_delta_time=4.) -> List[List[str]]:
     """
     Group a set of exposures by their visual features.
 
     Parameters:
         exposure_paths (list): Paths to exposures to group.
-        max_delta (float): Maximum exposure time difference for separating exposures, in seconds.
+        max_delta_time (float): Maximum exposure time difference for separating exposures, in seconds.
     
     Returns:
         list: Groups of exposure paths.
