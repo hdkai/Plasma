@@ -31,7 +31,7 @@ def group_exposures (exposure_paths: List[str], similarity_fn: Callable[[Image.I
     # Load all exposures into memory
     with ThreadPoolExecutor(max_workers=workers) as executor:
         # Sort by timestamp
-        exposures_with_paths = executor.map(lambda path: (path, load_exposure(path)), exposure_paths)
+        exposures_with_paths = executor.map(lambda path: (path, load_exposure(path, size=1200)), exposure_paths)
         exposures_with_paths = sorted(exposures_with_paths, key=lambda pair: exposure_timestamp(pair[1]))
         exposure_paths, exposures = list(zip(*exposures_with_paths))
         # Compute pairwise similarity

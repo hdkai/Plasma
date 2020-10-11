@@ -15,7 +15,7 @@ from ..metadata import exifread, exifwrite
 from ..raster import is_raster_format
 from ..raw import is_raw_format
 
-def load_exposure (image_path: str) -> Image.Image:
+def load_exposure (image_path: str, size: int=1024) -> Image.Image:
     """
     Load an exposure into memory.
 
@@ -25,6 +25,7 @@ def load_exposure (image_path: str) -> Image.Image:
     
     Parameters:
         image_path (str): Path to exposure.
+        size (int): Image size.
     
     Returns:
         PIL.Image: Loaded exposure.
@@ -60,6 +61,12 @@ def load_exposure (image_path: str) -> Image.Image:
         # Append metadata
         metadata = exifread(image_path)
         exifwrite(image, metadata)
+    # Downsample
+    width, height = image.size
+    scale_factor = max(width / size, height / size)
+    new_width = int(width * scale_factor)
+    new_height = int(height * scale_factor)
+    image = image.resize((new_width, new_height), resample=Image.BILINEAR)
     return image
 
 def normalize_exposures (image_a: Image.Image, image_b: Image.Image) -> Tuple[Image.Image, Image.Image]:
