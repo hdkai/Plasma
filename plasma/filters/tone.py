@@ -28,6 +28,7 @@ def exposure (input: Tensor, weight: Tensor) -> Tensor:
     # Interpolate control points with Lagrange polynomials
     control = 0.5 * ANCHORS[:,:,0] * weight * (weight - 1.) - ANCHORS[:,:,1] * (weight + 1) * (weight - 1) + 0.5 * ANCHORS[:,:,2] * weight * (weight + 1)
     result = tone_curve(input, control)
+    result = result.clamp(min=-1., max=1.)
     return result
 
 def tone_curve (input: Tensor, control: Tensor) -> Tensor:
@@ -36,6 +37,7 @@ def tone_curve (input: Tensor, control: Tensor) -> Tensor:
 
     We use a natural cubic curve to perform the mapping.
     The control query points are fixed at [-1.0, -0.33, 0.33, 1.0].
+    Note that this function does not clamp the output tensor to any range.
     
     Reference: http://thalestriangles.blogspot.com/2014/02/a-bit-of-ex-spline-ation.html
 
@@ -71,5 +73,5 @@ def tone_curve (input: Tensor, control: Tensor) -> Tensor:
     # Final curve
     y = where(x > x_1, l_2 + c_2, l_1 + c_1)
     y = where(x > x_2, l_3 + c_3, y)
-    result = y.view_as(input).clamp(min=-1., max=1.)
+    result = y.view_as(input)
     return result
