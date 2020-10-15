@@ -9,7 +9,7 @@ from typing import Callable, List
 
 from .timestamp import exposure_timestamp
 
-def group_exposures (exposure_paths: List[str], similarity_fn: Callable[[Image.Image, Image.Image], bool], workers: int=8) -> List[List[str]]:
+def group_exposures (exposure_paths: List[str], similarity_fn: Callable[[Image.Image, Image.Image], bool], workers: int=8) -> List[List[str]]: # INCOMPLETE # Threading
     """
     Group a set of exposures using a similarity function.
 

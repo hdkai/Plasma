@@ -59,31 +59,3 @@ def lab_to_xyz (input: Tensor):
     xyz_colors = diag(d65).matmul(d65_xyz.flatten(start_dim=2))
     xyz = xyz_colors.view_as(input)
     return xyz
-
-def rgb_to_lab (input: Tensor) -> Tensor:
-    """
-    Convert RGB to Lab.
-
-    Parameters:
-        input (Tensor): Input image with shape (N,3,...) in range [-1., 1.].
-    
-    Returns:
-        Tensor: Lab image with shape (N,3,...), with 0 <= L <= 100, -127 <= a, b <= 127.
-    """
-    xyz = rgb_to_xyz(input)
-    lab = xyz_to_lab(xyz)
-    return lab
-
-def lab_to_rgb (input: Tensor) -> Tensor:
-    """
-    Convert Lab to RGB.
-
-    Parameters:
-        input (Tensor): Input image with shape (N,3,...).
-    
-    Returns:
-        Tensor: RGB image with shape (N,3,...) in range [-1., 1.].
-    """
-    xyz = lab_to_xyz(input)
-    rgb = xyz_to_rgb(xyz)
-    return rgb
