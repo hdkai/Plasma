@@ -5,15 +5,17 @@
 
 from torch import cat, diag_embed, ones_like, tensor, where, Tensor
 
-from ..conversion import linear_to_srgb, rgb_to_xyz ,srgb_to_linear, xyy_to_xyz, xyz_to_rgb, xyz_to_xyy
+from ..conversion import linear_to_srgb, rgb_to_xyz, srgb_to_linear, xyy_to_xyz, xyz_to_rgb, xyz_to_xyy
 
-def color_balance (input: Tensor, weight: Tensor) -> Tensor:
+def chromatic_adaptation (input: Tensor, weight: Tensor) -> Tensor:
     """
-    Apply color balance adjustment (temperature and tint) on an RGB image.
+    Apply chromatic adaptation on an image.
+
+    We use the Bradford LMS cone response transform.
 
     Parameters:
-        input (Tensor): Input RGB image with shape (N,3,H,W) in range [-1., 1.].
-        weight (Tensor): Scalar weight with shape (N,2) in range [-1., 1.].
+        input (Tensor): Input image with shape (N,3,H,W) in range [-1., 1.].
+        weight (Tensor): Scalar temperature and tint weights with shape (N,2) in range [-1., 1.].
 
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in range [-1., 1.].
@@ -22,7 +24,7 @@ def color_balance (input: Tensor, weight: Tensor) -> Tensor:
     _, _, height, width = input.shape
     input = srgb_to_linear(input)
     xyz = rgb_to_xyz(input)
-    # Apply Bradford transformation # Used by Photoshop and Lightroom
+    # Apply Bradford transformation # Used by ACR
     d65_white = tensor([[ 0.95047, 1.0, 1.08883 ]]).float().to(input.device).unsqueeze(dim=2) # for 2 degree observer
     dst_white = _temperature_tint_to_xyz(weight).unsqueeze(dim=2)
     BRADFORD = tensor([

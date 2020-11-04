@@ -5,16 +5,16 @@
 
 from torch import cat, lerp, where, Tensor
 
+from ..blending import blend_soft_light
 from ..conversion import rgb_to_luminance, rgb_to_yuv, yuv_to_rgb
 from ..sampling import bilateral_filter_2d, gaussian_blur_2d
-from .functional import blend_soft_light
 
 def clarity (input: Tensor, weight: Tensor) -> Tensor:
     """
     Apply coarse local contrast to an image.
 
     Parameters:
-        input (Tensor): Input RGB image with shape (N,3,H,W) in range [-1., 1.].
+        input (Tensor): Input image with shape (N,3,H,W) in range [-1., 1.].
         weight (Tensor | float): Scalar weight with shape (N,1) in range [-1., 1.].
 
     Returns:
@@ -37,7 +37,7 @@ def highlights (input: Tensor, weight: Tensor, tonal_range: float=1.) -> Tensor:
     Apply highlight attentuation to an image.
 
     Parameters:
-        input (Tensor): Input RGB image with shape (N,3,H,W) in range [-1., 1.].
+        input (Tensor): Input image with shape (N,3,H,W) in range [-1., 1.].
         weight (Tensor | float): Scalar weight with shape (N,1) in range [-1., 1.].
         tonal_range (float): Tonal range of the filter in range [0., 1.].
 
@@ -60,7 +60,7 @@ def shadows (input: Tensor, weight: Tensor, tonal_range: float=1.) -> Tensor:
     Apply shadow attentuation to an image.
 
     Parameters:
-        input (Tensor): Input RGB image with shape (N,3,H,W) in range [-1., 1.].
+        input (Tensor): Input image with shape (N,3,H,W) in range [-1., 1.].
         weight (Tensor | float): Scalar weight with shape (N,1) in range [-1., 1.].
         tonal_range (float): Tonal range of the filter in range [0., 1.].
 
@@ -84,7 +84,7 @@ def sharpen (input: Tensor, weight: Tensor) -> Tensor: # INCOMPLETE # Mask
     Apply sharpness enhancement to an image.
 
     Parameters:
-        input (Tensor): Input RGB image with shape (N,3,H,W) in range [-1., 1.].
+        input (Tensor): Input image with shape (N,3,H,W) in range [-1., 1.].
         weight (Tensor | float): Scalar weight with shape (N,1) in range [-1., 1.].
 
     Returns:
@@ -104,7 +104,7 @@ def texture (input: Tensor, weight: Tensor) -> Tensor:
     Apply fine local contrast to an image.
 
     Parameters:
-        input (Tensor): Input RGB image with shape (N,3,H,W) in range [-1., 1.].
+        input (Tensor): Input image with shape (N,3,H,W) in range [-1., 1.].
         weight (Tensor | float): Scalar weight with shape (N,1) in range [-1., 1.].
 
     Returns:
