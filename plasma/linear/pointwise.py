@@ -26,7 +26,7 @@ def contrast (input: Tensor, weight: Tensor) -> Tensor:
 
 def exposure (input: Tensor, weight: Tensor) -> Tensor:
     """
-    Apply exposure adjustment to an image.
+    Apply tonal exposure adjustment to an image.
 
     Parameters:
         input (Tensor): Input image with shape (N,3,H,W) in range [-1., 1.].
@@ -72,7 +72,7 @@ def saturation (input: Tensor, weight: Tensor) -> Tensor:
     result = yuv_to_rgb(yuv)
     return result
 
-def color_balance (input: Tensor, weight: Tensor) -> Tensor: # INCOMPLETE
+def color_balance (input: Tensor, weight: Tensor) -> Tensor:
     """
     Apply color balance adjustment on an image.
 
@@ -83,47 +83,12 @@ def color_balance (input: Tensor, weight: Tensor) -> Tensor: # INCOMPLETE
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in range [-1., 1.].
     """
-    pass
-
-def temperature (input: Tensor, weight: Tensor) -> Tensor: # INCOMPLETE # Merge with `tint` for `color_balance`
-    """
-    Apply temperature adjustment to an image.
-
-    Parameters:
-        input (Tensor): Input image with shape (N,3,H,W) in range [-1., 1.].
-        weight (Tensor | float): Scalar weight with shape (N,1) in range [-1., 1.].
-
-    Returns:
-        Tensor: Filtered image with shape (N,3,H,W) in range [-1., 1.].
-    """
     _, _, height, width = input.shape
     yuv = rgb_to_yuv(input)
     y, u, v = yuv.split(1, dim=1)
-    u = u.flatten(start_dim=1) - 0.1 * weight
-    v = v.flatten(start_dim=1) + 0.1 * weight
-    u = u.view(-1, 1, height, width)
-    v = v.view(-1, 1, height, width)
-    y = y.expand_as(u)
-    yuv = cat([y, u, v], dim=1)
-    result = yuv_to_rgb(yuv)
-    return result
-
-def tint (input: Tensor, weight: Tensor) -> Tensor:
-    """
-    Apply tint adjustment to an image.
-
-    Parameters:
-        input (Tensor): Input image with shape (N,3,H,W) in range [-1., 1.].
-        weight (Tensor | float): Scalar weight with shape (N,1) in range [-1., 1.].
-
-    Returns:
-        Tensor: Filtered image with shape (N,3,H,W) in range [-1., 1.].
-    """
-    _, _, height, width = input.shape
-    yuv = rgb_to_yuv(input)
-    y, u, v = yuv.split(1, dim=1)
-    u = u.flatten(start_dim=1) + 0.1 * weight
-    v = v.flatten(start_dim=1) + 0.1 * weight
+    temp, tint = weight.split(1, dim=1)
+    u = u.flatten(start_dim=1) + 0.1 * (tint - temp)
+    v = v.flatten(start_dim=1) + 0.1 * (tint + temp)
     u = u.view(-1, 1, height, width)
     v = v.view(-1, 1, height, width)
     y = y.expand_as(u)

@@ -61,7 +61,7 @@ def _temperature_tint_to_xyz (input: Tensor) -> Tensor:
     # Convert to absolute temperature
     temp, tint = input.split(1, dim=1)
     temp = _temperature_to_kelvin(temp)
-    # Interpolate on Planckian locus
+    # Interpolate on Planckian locus in CIE1931 xyY # CHECK # Switch to UCS
     x_blackbody = -0.2661239 * 1e+9 / temp.pow(3.) - 0.2343589 * 1e+6 / temp.pow(2.) + 0.8776956 * 1e+3 / temp + 0.179910
     x_daylight = -3.0258469 * 1e+9 / temp.pow(3.) + 2.1070379 * 1e+6 / temp.pow(2.) + 0.2226347 * 1e+3 / temp + 0.240390
     x = where(temp < 4000, x_blackbody, x_daylight)
@@ -79,7 +79,7 @@ def _temperature_tint_to_xyz (input: Tensor) -> Tensor:
     xyz = cat([X, Y, Z], dim=1) # This tint correction is incorrect, but it's used by DT
     return xyz
 
-def _temperature_to_kelvin (input: Tensor) -> Tensor: # TEST
+def _temperature_to_kelvin (input: Tensor) -> Tensor:
     """
     Convert temperature in a relative range to absolute Kelvin.
 

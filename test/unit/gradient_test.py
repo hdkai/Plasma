@@ -7,7 +7,7 @@ from pytest import fixture, mark
 from torch import linspace, zeros
 from .common import tensorwrite
 
-from plasma.filters.functional import radial_gradient, top_bottom_gradient, bottom_top_gradient, left_right_gradient, right_left_gradient
+from plasma.gradients import radial_gradient, top_bottom_gradient, bottom_top_gradient, left_right_gradient, right_left_gradient
 
 def test_radial_gradient ():
     input = zeros(1, 1, 720, 1280)
