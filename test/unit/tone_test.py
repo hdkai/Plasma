@@ -8,7 +8,7 @@ from pytest import fixture, mark
 from torch import float32, tensor
 from .common import tensorread, tensorwrite
 
-from plasma.filters import exposure, tone_curve
+from plasma.linear import exposure, tone_curve
 
 IMAGE_PATHS = [
     "test/media/filter/1.jpg",

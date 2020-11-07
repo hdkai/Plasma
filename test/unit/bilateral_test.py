@@ -7,7 +7,7 @@ from pytest import fixture, mark
 from torch import isnan, zeros, zeros_like
 from .common import tensorread, tensorwrite
 
-from plasma.filters import clarity, texture
+from plasma.linear import clarity, texture
 from plasma.sampling import bilateral_filter_2d, slice_bilateral_grid
 
 IMAGE_PATHS = [

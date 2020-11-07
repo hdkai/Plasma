@@ -5,32 +5,6 @@
 
 from torch import tensor, where, Tensor
 
-def exposure (input: Tensor, weight: Tensor) -> Tensor:
-    """
-    Apply exposure adjustment to an image.
-
-    Parameters:
-        input (Tensor): Input RGB image with shape (N,3,H,W) in range [-1., 1.].
-        weight (Tensor | float): Scalar weight with shape (N,1) in range [-1., 1.].
-
-    Returns:
-        Tensor: Filtered image with shape (N,3,H,W) in range [-1., 1.].
-    """
-    samples, _, _, _ = input.shape
-    ANCHORS = tensor([
-        # x = [-1, 0, 1]
-        [-1., -1., -1.],            # c_0
-        [-0.874, -1. / 3., 0.318],  # c_1
-        [-0.686, 1. / 3., 0.812],   # c_2
-        [-0.254, 1., 1.]            # c_3
-    ])
-    ANCHORS = ANCHORS.repeat(samples, 1, 1).to(input.device)
-    # Interpolate control points with Lagrange polynomials
-    control = 0.5 * ANCHORS[:,:,0] * weight * (weight - 1.) - ANCHORS[:,:,1] * (weight + 1) * (weight - 1) + 0.5 * ANCHORS[:,:,2] * weight * (weight + 1)
-    result = tone_curve(input, control)
-    result = result.clamp(min=-1., max=1.)
-    return result
-
 def tone_curve (input: Tensor, control: Tensor) -> Tensor:
     """
     Apply a tone curve to an image.
@@ -39,8 +13,6 @@ def tone_curve (input: Tensor, control: Tensor) -> Tensor:
     The control query points are fixed at [-1.0, -0.33, 0.33, 1.0].
     Note that this function does not clamp the output tensor to any range.
     
-    Reference: http://thalestriangles.blogspot.com/2014/02/a-bit-of-ex-spline-ation.html
-
     Parameters:
         input (Tensor): Input image with shape (N,...) in range [-1., 1.].
         control (Tensor): Control value points with shape (N,4) in range [-1., 1.].

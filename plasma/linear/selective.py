@@ -15,8 +15,8 @@ def selective_color (input: Tensor, basis: Tensor, weight: Tensor) -> Tensor:
     All `M` filters are applied simultaneously.
 
     Parameters:
-        input (Tensor): Input RGB image with shape (N,3,H,W) in range [-1., 1.].
-        basis (Tensor): Basis RGB colors with shape (M,3) in range [0., 1.].
+        input (Tensor): Input image with shape (N,3,H,W) in range [-1., 1.].
+        basis (Tensor): Basis colors with shape (M,3) in range [0., 1.].
         weight (Tensor): Per-basis hue, saturation, and luminance adjustments with shape (N,M,3) in range [-1., 1.].
     
     Returns:
