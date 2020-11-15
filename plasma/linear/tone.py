@@ -20,6 +20,7 @@ def tone_curve (input: Tensor, control: Tensor) -> Tensor:
     Returns:
         Tensor: Result image with shape (N,...) in range [-1., 1.].
     """
+    _, channels, height, width = input.shape
     x_0, x_1, x_2, x_3 = -1, -1. / 3., 1. / 3., 1.
     y_0, y_1, y_2, y_3 = control.split(1, dim=1)
     x = input.flatten(start_dim=1)
@@ -45,5 +46,5 @@ def tone_curve (input: Tensor, control: Tensor) -> Tensor:
     # Final curve
     y = where(x > x_1, l_2 + c_2, l_1 + c_1)
     y = where(x > x_2, l_3 + c_3, y)
-    result = y.view_as(input)
+    result = y.view(-1, channels, height, width)
     return result

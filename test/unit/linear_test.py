@@ -20,6 +20,7 @@ IMAGE_PATHS = [
     "test/media/filter/8.jpg",
     "test/media/filter/9.jpg",
     "test/media/filter/10.jpg",
+    "/Users/yusuf/Desktop/Parkway/edit/w1.jpg"
 ]
 
 @mark.parametrize("image_path", IMAGE_PATHS)
@@ -35,6 +36,13 @@ def test_contrast (image_path):
     weights = linspace(-1., 1., 20).view(-1, 1)
     results = contrast(image, weights)
     tensorwrite("contrast.gif", *results.split(1, dim=0))
+
+@mark.parametrize("image_path", IMAGE_PATHS)
+def test_exposure (image_path):
+    image = tensorread(image_path)
+    weights = linspace(-1., 1., 20).view(-1, 1)
+    results = exposure(image, weights)
+    tensorwrite("exposure.gif", *results.split(1, dim=0))
 
 @mark.parametrize("image_path", IMAGE_PATHS)
 def test_highlights (image_path):
