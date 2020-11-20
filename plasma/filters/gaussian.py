@@ -7,7 +7,7 @@ from torch import arange, exp, tensor, Tensor
 from torch.nn.functional import conv2d, conv3d, pad
 from typing import Tuple
 
-def gaussian_kernel_1d (kernel_size: int, sigma: float = -1.) -> Tensor:
+def gaussian_kernel (kernel_size: int, sigma: float = -1.) -> Tensor:
     """
     Normalized 1D Gaussian kernel.
     This operation is NOT differentiable w.r.t its arguments.
@@ -25,10 +25,9 @@ def gaussian_kernel_1d (kernel_size: int, sigma: float = -1.) -> Tensor:
     kernel = exp((-x.pow(2.) / (2. * sigma ** 2)))
     return kernel / kernel.sum()
 
-def gaussian_blur_2d (input: Tensor, kernel_size: Tuple[int, int]) -> Tensor:
+def gaussian_filter (input: Tensor, kernel_size: Tuple[int, int]) -> Tensor:
     """
-    Apply Gaussian smoothing to a 2D image.
-    This operation is not differentiable w.r.t the kernel size.
+    Apply a Gaussian filter to an image.
 
     Parameters:
         input (Tensor): Input image with shape (N,C,H,W).
@@ -40,8 +39,8 @@ def gaussian_blur_2d (input: Tensor, kernel_size: Tuple[int, int]) -> Tensor:
     _,channels,_,_ = input.shape
     kernel_size_y, kernel_size_x = kernel_size
     # Compute kernels
-    kernel_x = gaussian_kernel_1d(kernel_size_x).to(input.device)
-    kernel_y = gaussian_kernel_1d(kernel_size_y).to(input.device)
+    kernel_x = gaussian_kernel(kernel_size_x).to(input.device)
+    kernel_y = gaussian_kernel(kernel_size_y).to(input.device)
     # Reshape
     kernel_x = kernel_x.expand(channels, 1, 1, -1)
     kernel_y = kernel_y.expand(channels, 1, 1, -1).permute(0, 1, 3, 2).contiguous()
@@ -50,10 +49,9 @@ def gaussian_blur_2d (input: Tensor, kernel_size: Tuple[int, int]) -> Tensor:
     result = conv2d(result, kernel_y, padding=(kernel_size_y // 2, 0), groups=channels)
     return result
 
-def gaussian_blur_3d (input: Tensor, kernel_size: Tuple[int, int, int]) -> Tensor:
+def gaussian_filter_3d (input: Tensor, kernel_size: Tuple[int, int, int]) -> Tensor:
     """
-    Apply Gaussian smoothing to a 3D volume.
-    This operation is not differentiable w.r.t the kernel size.
+    Apply a Gaussian filter to a volume.
 
     Parameters:
         input (Tensor): Input volume with shape (N,C,D,H,W).
@@ -65,9 +63,9 @@ def gaussian_blur_3d (input: Tensor, kernel_size: Tuple[int, int, int]) -> Tenso
     _,channels,_,_,_ = input.shape
     kernel_size_z, kernel_size_y, kernel_size_x = kernel_size
     # Compute kernels
-    kernel_x = gaussian_kernel_1d(kernel_size_x).to(input.device)
-    kernel_y = gaussian_kernel_1d(kernel_size_y).to(input.device)
-    kernel_z = gaussian_kernel_1d(kernel_size_z).to(input.device)
+    kernel_x = gaussian_kernel(kernel_size_x).to(input.device)
+    kernel_y = gaussian_kernel(kernel_size_y).to(input.device)
+    kernel_z = gaussian_kernel(kernel_size_z).to(input.device)
     # Reshape
     kernel_x = kernel_x.expand(channels, 1, 1, 1, -1)
     kernel_y = kernel_y.expand(channels, 1, 1, 1, -1).permute(0, 1, 2, 4, 3).contiguous()
@@ -77,41 +75,3 @@ def gaussian_blur_3d (input: Tensor, kernel_size: Tuple[int, int, int]) -> Tenso
     result = conv3d(result, kernel_y, padding=(0, kernel_size_y // 2, 0), groups=channels)
     result = conv3d(result, kernel_z, padding=(kernel_size_z // 2, 0, 0), groups=channels)
     return result
-
-def laplacian_of_gaussian_2d (input: Tensor) -> Tensor:
-    """
-    Apply a 5x5 Laplacian-of-Gaussian filter to a 2D image.
-
-    Parameters:
-        input (Tensor): Input image with shape (N,C,H,W).
-
-    Returns:
-        Tensor: Filtered image with shape (N,C,H,W).
-    """
-    _,channels,_,_ = input.shape
-    # Build kernels
-    gaussian_kernel = 1. / 16. * tensor([
-        [1., 4., 6., 4., 1.],
-        [4., 16., 24., 16., 4.],
-        [6., 24., 36., 24., 6.],
-        [4., 16., 24., 16., 4.],
-        [1., 4., 6., 4., 1.]
-    ])
-    laplacian_kernel = tensor([ # CHECK # Normalize?
-        [1., 1., 1., 1., 1.],
-        [1., 1., 1., 1., 1.],
-        [1., 1., -24., 1., 1.],
-        [1., 1., 1., 1., 1.],
-        [1., 1., 1., 1., 1.]
-    ])
-    gaussian_kernel = gaussian_kernel.view(1, 1, 5, 5).repeat(channels, 1, 1, 1).to(input.device)
-    laplacian_kernel = laplacian_kernel.view(1, 1, 5, 5).repeat(channels, 1, 1, 1).to(input.device)
-    # Apply Gaussian
-    gaussian = pad(input, (2, 2, 2, 2), mode="reflect")
-    gaussian = conv2d(gaussian, gaussian_kernel, groups=channels)
-    # Apply Laplacian
-    laplacian = pad(gaussian, (2, 2, 2, 2), mode="reflect")
-    laplacian = conv2d(laplacian, laplacian_kernel, groups=channels)
-    # Compute absolute response
-    response = laplacian.abs()
-    return response

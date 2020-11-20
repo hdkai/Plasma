@@ -8,7 +8,7 @@ from numpy import linspace, tile, uint16
 from pytest import fixture, mark
 from .common import tensorread, tensorwrite
 
-from plasma.sampling import color_sample_1d, color_sample_3d, cuberead, lutread
+from plasma.filters import color_sample_1d, color_sample_3d, cuberead, lutread
 
 IMAGE_PATHS = [
     "test/media/filter/1.jpg",

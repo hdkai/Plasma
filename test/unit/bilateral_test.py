@@ -8,7 +8,7 @@ from torch import isnan, zeros, zeros_like
 from .common import tensorread, tensorwrite
 
 from plasma.linear import clarity, texture
-from plasma.sampling import bilateral_filter_2d, slice_bilateral_grid
+from plasma.filters import slice_bilateral_grid
 
 IMAGE_PATHS = [
     "test/media/filter/1.jpg",

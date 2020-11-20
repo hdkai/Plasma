@@ -8,14 +8,18 @@ from torch.nn.functional import grid_sample, interpolate, pad
 from typing import Optional, Tuple
 
 from ..conversion import rgb_to_luminance
-from .gaussian import gaussian_blur_3d
+from .gaussian import gaussian_filter_3d
 
-def bilateral_filter_2d (input: Tensor, kernel_size: Tuple[int, int], grid_size: Optional[Tuple[int, int, int]]=None) -> Tensor:
+def bilateral_filter (input: Tensor, guide: Tensor, kernel_size: Tuple[int, int], grid_size: Optional[Tuple[int, int, int]]=None) -> Tensor:
     """
-    Apply the bilateral filter to a 2D image.
+    Apply the joint bilateral filter to an image.
+
+    We utilize the Bilateral Grid as described by Chen et al.
+    https://people.csail.mit.edu/sparis/publi/2007/siggraph/Chen_07_Bilateral_Grid.pdf
 
     Parameters:
-        input (Tensor): Input image with shape (N,C,H,W). Channel count `C` MUST be 1 or 3.
+        input (Tensor): Input image with shape (N,C,H,W).
+        guide (Tensor): Guide image with shape (N,1,H,W).
         kernel_size (tuple): Kernel size in intensity and spatial dimensions (Ki,Ks).
         grid_size (tuple): Bilateral grid size. If `None`, a suitable default will be used.
 
@@ -25,12 +29,11 @@ def bilateral_filter_2d (input: Tensor, kernel_size: Tuple[int, int], grid_size:
     kernel_size = (kernel_size[0], kernel_size[1], kernel_size[1])
     grid_size = grid_size if grid_size is not None else (16, 512, 512)
     channels = input.split(1, dim=1)
-    luminance = rgb_to_luminance(input) if input.shape[1] == 3 else input
     result = []
     for channel in channels:
-        grid = splat_bilateral_grid(channel, luminance, grid_size)
-        grid = gaussian_blur_3d(grid, kernel_size)
-        channel = slice_bilateral_grid(grid, luminance, homogenous=True)
+        grid = splat_bilateral_grid(channel, guide, grid_size)
+        grid = gaussian_filter_3d(grid, kernel_size)
+        channel = slice_bilateral_grid(grid, guide, homogenous=True)
         result.append(channel)
     result = cat(result, dim=1)
     return result
@@ -69,7 +72,7 @@ def splat_bilateral_grid (input: Tensor, guide: Tensor, grid_size: Tuple[int, in
 
 def slice_bilateral_grid (input: Tensor, guide: Tensor, homogenous: bool=False) -> Tensor:
     """
-    Slice a bilateral grid to produce image.
+    Slice a bilateral grid to an image.
 
     Parameters:
         input (Tensor): Input bilateral grid with shape (N,C,I,Sy,Sx).
