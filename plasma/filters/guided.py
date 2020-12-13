@@ -8,7 +8,7 @@ from torch.nn.functional import conv2d
 
 from .box import box_filter
 
-def guided_filter (input: Tensor, guide: Tensor, radius: int, eps: float) -> Tensor: # TEST
+def guided_filter (input: Tensor, guide: Tensor, radius: int, eps: float) -> Tensor:
     """
     Apply the guided image filter to a 2D image.
 

@@ -9,17 +9,20 @@ from torch.nn.functional import normalize
 from ..conversion import rgb_to_luminance
 from ..filters import laplacian_of_gaussian_filter
 
-def exposure_fusion (input: Tensor, omega_con: Tensor, omega_exp: Tensor, omega_sat: Tensor) -> Tensor:
+def exposure_fusion (input: Tensor, omega_con: Tensor, omega_exp: Tensor, omega_sat: Tensor) -> Tensor: # INCOMPLETE
     """
-    Fuse a set of exposure using Mertens et al.
+    Fuse a set of exposure using Mertens et al (2009).
 
     https://mericam.github.io/papers/exposure_fusion_reduced.pdf
 
     Parameters:
-        input (Tensor): Input exposure stack with shape (N,C,H,W) in range [-1., 1.], where C is a multiple of 3.
+        input (Tensor): Input exposure stack with shape (N,3M,H,W) in range [-1., 1.].
         omega_con (Tensor): Contrast weight with shape (N,1) in range [0., 1.].
         omega_exp (Tensor): Exposure weight with shape (N,1) in range [0., 1.].
         omega_sat (Tensor): Saturation weight with shape (N,1) in range [0., 1.].
+
+    Returns:
+        Tensor: Fused image with shape (N,3,H,W) in range [-1., 1.].
     """
     _, _, height, width = input.shape
     # Split exposures and compute luminance

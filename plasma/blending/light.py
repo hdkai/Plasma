@@ -20,7 +20,7 @@ def blend_soft_light (base: Tensor, overlay: Tensor) -> Tensor:
     """
     # Rescale
     base = (base + 1.) / 2.
-    base = base.clamp(min=1e-3) # Prevent NaN on sqrt::backward
+    base = base.clamp(min=1e-4) # Prevent NaN on sqrt::backward
     overlay =  (overlay + 1.) / 2.
     # Blend
     result = (1. - 2. * overlay) * base.pow(2.) + 2. * base * overlay

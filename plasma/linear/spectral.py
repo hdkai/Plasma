@@ -7,11 +7,11 @@ from torch import cat, lerp, where, Tensor
 
 from ..blending import blend_soft_light
 from ..conversion import rgb_to_luminance, rgb_to_yuv, yuv_to_rgb
-from ..filters import bilateral_filter, gaussian_filter
+from ..filters import bilateral_filter, gaussian_filter, guided_filter
 
-def clarity (input: Tensor, weight: Tensor) -> Tensor:
+def clarity (input: Tensor, weight: Tensor) -> Tensor: # INCOMPLETE # Scale radius with pixel size
     """
-    Apply coarse local contrast to an image.
+    Apply coarse-scale local contrast to an image.
 
     Parameters:
         input (Tensor): Input image with shape (N,3,H,W) in range [-1., 1.].
@@ -23,11 +23,14 @@ def clarity (input: Tensor, weight: Tensor) -> Tensor:
     _, _, height, width = input.shape
     # Compute base layer
     y, u, v = rgb_to_yuv(input).split(1, dim=1)
-    y = bilateral_filter(y, y, kernel_size=(7, 7), grid_size=(36, 256, 256))
+    y = guided_filter(y, y, 11, 0.02)
     yuv = cat([y, u, v], dim=1)
     base_layer = yuv_to_rgb(yuv)
     # Interpolate
-    result_colors = base_layer.flatten(start_dim=1).lerp(input.flatten(start_dim=1), weight + 1.)
+    base_colors = base_layer.flatten(start_dim=1).clamp(min=-1., max=1.)
+    input_colors = input.flatten(start_dim=1)
+    result_colors = base_colors.lerp(input_colors, weight + 1.)
+    # Reshape
     result = result_colors.view(-1, 3, height, width)
     result = result.clamp(min=-1., max=1.)
     return result
@@ -92,16 +95,19 @@ def sharpen (input: Tensor, weight: Tensor) -> Tensor:
     """
     _, _, height, width = input.shape
     # Compute base layer
-    base_layer = gaussian_filter(input, (3, 3))
+    base_layer = gaussian_filter(input, kernel_size=(3, 3))
     # Interpolate
-    result_colors = base_layer.flatten(start_dim=1).lerp(input.flatten(start_dim=1), weight + 1.)
+    base_colors = base_layer.flatten(start_dim=1)
+    input_colors = input.flatten(start_dim=1)
+    result_colors = base_colors.lerp(input_colors, weight + 1.)
+    # Reshape
     result = result_colors.view(-1, 3, height, width)
     result = result.clamp(min=-1., max=1.)
     return result
 
-def texture (input: Tensor, weight: Tensor) -> Tensor:
+def texture (input: Tensor, weight: Tensor) -> Tensor: # INCOMPLETE # Scale radius with pixel size
     """
-    Apply fine local contrast to an image.
+    Apply fine-scale local contrast to an image.
 
     Parameters:
         input (Tensor): Input image with shape (N,3,H,W) in range [-1., 1.].
@@ -113,9 +119,12 @@ def texture (input: Tensor, weight: Tensor) -> Tensor:
     _, _, height, width = input.shape
     # Compute base layer
     luminance = rgb_to_luminance(input)
-    base_layer = bilateral_filter(input, luminance, kernel_size=(5, 5), grid_size=(32, 1000, 1000))
+    base_layer = guided_filter(input, luminance, 7, 0.015)
     # Interpolate
-    result_colors = base_layer.flatten(start_dim=1).lerp(input.flatten(start_dim=1), weight + 1.)
+    base_colors = base_layer.flatten(start_dim=1).clamp(min=-1., max=1.)
+    input_colors = input.flatten(start_dim=1)
+    result_colors = base_colors.lerp(input_colors, weight + 1.)
+    # Reshape
     result = result_colors.view(-1, 3, height, width)
     result = result.clamp(min=-1., max=1.)
     return result
