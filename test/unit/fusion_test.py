@@ -31,3 +31,10 @@ def test_exposure_fusion (window_exposures):
     fusion = exposure_fusion(exposure_stack, 1., 1.)
     fusion = fusion.clamp(min=-1., max=1.)
     tensorwrite("fusion.jpg", fusion)
+
+def test_exposure_fusion_highlights (bright_kitchen_exposures):
+    exposures = [tensorread(path) for path in bright_kitchen_exposures]
+    exposure_stack = cat(exposures, dim=1)
+    fusion = exposure_fusion(exposure_stack, 1., 1.)
+    fusion = fusion.clamp(min=-1., max=1.)
+    tensorwrite("fusion.jpg", fusion)

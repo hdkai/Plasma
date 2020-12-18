@@ -8,7 +8,7 @@ from torch import logspace, stack, zeros, Tensor
 from torch.nn.functional import interpolate
 from typing import List
 
-def blend_pyramid (input: Tensor, weights: Tensor, levels: float=0.8) -> Tensor: # INCOMPLETE # Reparameterize `levels`
+def blend_pyramid (input: Tensor, weights: Tensor, peak_level: int=2) -> Tensor:
     """
     Blend a stack of images using Burt & Adelson (1983).
 
@@ -17,16 +17,14 @@ def blend_pyramid (input: Tensor, weights: Tensor, levels: float=0.8) -> Tensor:
     Parameters:
         input (Tensor): Input image stack with shape (N,3M,H,W) in range [-1., 1.].
         weights (Tensor): Weight map stack with shape (N,M,H,W) in range [0., 1.].
-        levels (float): Relative number of levels to use for blending, in range [0., 1.].
+        peak_level (int): Size of peak Laplacian pyramid level.
 
     Returns:
         Tensor: Fused image with shape (N,3,H,W) in range [-1., 1.].
     """
     _, channels, height, width = input.shape
     exposures = channels // 3
-    # Compute pyramid levels
-    max_levels = log2(min(width, height))
-    levels = int(levels * max_levels)    
+    levels = int(log2(min(width, height)) - log2(peak_level))
     # Iterate
     result_pyramid = []
     for image, weight in zip(input.split(3, dim=1), weights.split(1, dim=1)):
