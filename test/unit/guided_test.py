@@ -5,6 +5,7 @@
 
 from pytest import fixture, mark
 from torch import cat, linspace, zeros, zeros_like
+from torch.nn.functional import interpolate
 from .common import tensorread, tensorwrite
 
 from plasma.conversion import rgb_to_luminance, rgb_to_yuv, yuv_to_rgb
@@ -31,7 +32,19 @@ def test_guided_filter (image_path):
     tensorwrite("guided.jpg", result)
 
 @mark.parametrize("image_path", IMAGE_PATHS)
+def test_guided_upsample (image_path):
+    # Load image
+    image = tensorread(image_path, size=1024)
+    luminance = rgb_to_luminance(image)
+    # Downsample image
+    image = interpolate(image, scale_factor=0.4, mode="bilinear", align_corners=False)
+    # Upsample
+    result = guided_filter(image, luminance, 7, 0.05)
+    tensorwrite("upsample_guided.jpg", result)
+
+@mark.parametrize("image_path", IMAGE_PATHS)
 def test_guided_coarse_local_contrast (image_path):
+    # Load image
     image = tensorread(image_path, size=1024)
     weight = linspace(-1., 1., 20).view(-1, 1)
     # Compute base layer
