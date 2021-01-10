@@ -1,6 +1,6 @@
 # 
 #   Plasma
-#   Copyright (c) 2020 Homedeck, LLC.
+#   Copyright (c) 2021 Homedeck, LLC.
 #
 
 from .light import blend_soft_light
