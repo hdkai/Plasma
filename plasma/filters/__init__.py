@@ -1,6 +1,6 @@
 # 
 #   Plasma
-#   Copyright (c) 2020 Homedeck, LLC.
+#   Copyright (c) 2021 Homedeck, LLC.
 #
 
 from .bilateral import bilateral_filter, splat_bilateral_grid, slice_bilateral_grid

@@ -1,6 +1,6 @@
 # 
 #   Plasma
-#   Copyright (c) 2020 Homedeck, LLC.
+#   Copyright (c) 2021 Homedeck, LLC.
 #
 
 from pytest import fixture, mark
@@ -20,7 +20,6 @@ IMAGE_PATHS = [
     "test/media/filter/8.jpg",
     "test/media/filter/9.jpg",
     "test/media/filter/10.jpg",
-    "/Users/yusuf/Desktop/Parkway/edit/w1.jpg"
 ]
 
 @mark.parametrize("image_path", IMAGE_PATHS)

@@ -1,21 +1,21 @@
 # 
 #   Plasma
-#   Copyright (c) 2020 Homedeck, LLC.
+#   Copyright (c) 2021 Homedeck, LLC.
 #
 
 from torch import Tensor
-from torch.nn.functional import conv2d
+from torch.nn.functional import conv2d, interpolate
 
 from .box import box_filter
 
-def guided_filter (input: Tensor, guide: Tensor, radius: int, eps: float) -> Tensor: # TEST
+def guided_filter (input: Tensor, guide: Tensor, radius: int, eps: float) -> Tensor:
     """
     Apply the guided image filter to a 2D image.
 
     http://kaiminghe.com/publications/pami12guidedfilter.pdf
 
     Parameters:
-        input (Tensor): Input image with shape (N,C,H,W).
+        input (Tensor): Input image with shape (N,C,Sx,Sy).
         guide (Tensor): Guide image with shape (N,1,H,W).
         radius (int): Filter window radius.
         eps (float): Ridge regularization coefficient.
@@ -23,6 +23,9 @@ def guided_filter (input: Tensor, guide: Tensor, radius: int, eps: float) -> Ten
     Returns:
         Tensor: Filtered image with shape (N,C,H,W).
     """
+    # Upsample input
+    _, _, height, width = guide.shape
+    input = interpolate(input, size=(height, width), mode="bilinear", align_corners=False)
     # Guide variance
     guide_mean = box_filter(guide, radius)
     guide_mean_2 = box_filter(guide.pow(2.), radius)
