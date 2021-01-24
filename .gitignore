@@ -3,7 +3,7 @@ __pycache__
 .pytest_cache
 
 # IDE
-#.vscode
+.vscode
 .vs
 .idea
 

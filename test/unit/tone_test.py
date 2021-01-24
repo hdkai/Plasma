@@ -8,7 +8,7 @@ from pytest import fixture, mark
 from torch import float32, tensor
 from .common import tensorread, tensorwrite
 
-from plasma.linear import exposure, tone_curve
+from plasma.curves import natural_cubic_curve
 
 IMAGE_PATHS = [
     "test/media/filter/1.jpg",
@@ -19,41 +19,41 @@ IMAGE_PATHS = [
 ]
 
 @mark.parametrize("image_path", IMAGE_PATHS)
-def test_tone_curve (image_path):
+def test_natural_cubic_curve (image_path):
     image = tensorread(image_path)
     control = tensor([
         #[-1., 0.318, 0.812, 1.], # max LR exposure
         [-1, -0.874, -0.686, -0.254] # min LR exposure
     ])
-    result = tone_curve(image, control)
+    result = natural_cubic_curve(image, control)
     tensorwrite("tone.jpg", result)
 
 @mark.parametrize("image_path", IMAGE_PATHS)
-def test_tone_curve_shadow_control (image_path):
+def test_natural_cubic_shadow_control (image_path):
     image = tensorread(image_path)
     results = []
     for i in linspace(-0.8, 0.8, 21):
         control = tensor([ [-1., i, 0.33, 1.] ]).to(float32)
-        result = tone_curve(image, control)
+        result = natural_cubic_curve(image, control)
         results.append(result)
     tensorwrite("tone_shadow.gif", *results)
 
 @mark.parametrize("image_path", IMAGE_PATHS)
-def test_tone_curve_highlight_control (image_path):
+def test_natural_cubic_highlight_control (image_path):
     image = tensorread(image_path)
     results = []
     for i in linspace(-0.8, 0.8, 21):
         control = tensor([ [-1., -0.33, i, 1.] ]).to(float32)
-        result = tone_curve(image, control)
+        result = natural_cubic_curve(image, control)
         results.append(result)
     tensorwrite("tone_highlight.gif", *results)
 
 @mark.parametrize("image_path", IMAGE_PATHS)
-def test_tone_curve_contrast_control (image_path):
+def test_natural_cubic_contrast_control (image_path):
     image = tensorread(image_path)
     results = []
     for i in linspace(-0.4, 0.4, 21):
         control = tensor([ [-1., i - 0.33, 0.33 - i, 1.] ]).to(float32)
-        result = tone_curve(image, control)
+        result = natural_cubic_curve(image, control)
         results.append(result)
     tensorwrite("tone_contrast.gif", *results)
