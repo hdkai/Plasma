@@ -6,7 +6,6 @@
 from torch import cat, clamp, tensor, Tensor
 
 from ..conversion import rgb_to_yuv, yuv_to_rgb
-from .tone import tone_curve
 
 def contrast (input: Tensor, weight: Tensor) -> Tensor:
     """
@@ -20,13 +19,14 @@ def contrast (input: Tensor, weight: Tensor) -> Tensor:
         Tensor: Filtered image with shape (N,3,H,W) in range [-1., 1.].
     """
     _, channels, width, height = input.shape
-    result = input.flatten(start_dim=1) * (weight + 1.)
-    result = result.view(-1, channels, width, height).clamp(min=-1., max=1.)
+    result = (weight + 1.) * input.flatten(start_dim=1)
+    result = result.view(-1, channels, width, height)
+    result = result.clamp(min=-1., max=1.)
     return result
 
 def exposure (input: Tensor, weight: Tensor) -> Tensor:
     """
-    Apply tonal exposure adjustment to an image.
+    Apply exposure adjustment to an image.
 
     Parameters:
         input (Tensor): Input image with shape (N,3,H,W) in range [-1., 1.].
@@ -35,17 +35,9 @@ def exposure (input: Tensor, weight: Tensor) -> Tensor:
     Returns:
         Tensor: Filtered image with shape (N,3,H,W) in range [-1., 1.].
     """
-    samples, _, _, _ = input.shape
-    ANCHORS = tensor([
-        # x = [-1, 0, 1]
-        [-1., -1., -1.],            # c_0
-        [-0.874, -1. / 3., 0.318],  # c_1
-        [-0.686, 1. / 3., 0.812],   # c_2
-        [-0.254, 1., 1.]            # c_3
-    ])
-    ANCHORS = ANCHORS.repeat(samples, 1, 1).to(input.device)
-    control = 0.5 * ANCHORS[:,:,0] * weight * (weight - 1.) - ANCHORS[:,:,1] * (weight + 1) * (weight - 1) + 0.5 * ANCHORS[:,:,2] * weight * (weight + 1)
-    result = tone_curve(input, control)
+    _, channels, width, height = input.shape
+    result = (weight + 1.) * input.flatten(start_dim=1)
+    result = result.view(-1, channels, width, height) - 1.
     result = result.clamp(min=-1., max=1.)
     return result
 

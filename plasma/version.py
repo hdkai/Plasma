@@ -3,4 +3,4 @@
 #   Copyright (c) 2021 Homedeck, LLC.
 #
 
-__version__ = "0.0.26"
+__version__ = "0.0.27"

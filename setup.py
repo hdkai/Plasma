@@ -32,7 +32,7 @@ setup(
         "torchvision"
     ],
     url="https://github.com/hdkai/Plasma",
-    packages=find_packages(exclude=["examples", "playground", "test"]),
+    packages=find_packages(include=["plasma"]),
     package_data={
         "plasma.io": ["data/*.tif"],
     },
