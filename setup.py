@@ -20,7 +20,7 @@ setup(
     name="plasma",
     version=version,
     author="Homedeck, LLC.",
-    author_email="info@homedeck.io",
+    author_email="hi@hdk.ai",
     description="Differentiable image editing framework.",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -33,9 +33,7 @@ setup(
     ],
     url="https://github.com/hdkai/Plasma",
     packages=find_packages(include=["plasma"]),
-    package_data={
-        "plasma.io": ["data/*.tif"],
-    },
+    package_data={ },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
