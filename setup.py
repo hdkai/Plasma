@@ -32,7 +32,7 @@ setup(
         "torchvision"
     ],
     url="https://github.com/hdkai/Plasma",
-    packages=find_packages(include=["plasma"]),
+    packages=find_packages(include=["plasma", "plasma.*"]),
     package_data={ },
     classifiers=[
         "Programming Language :: Python :: 3",
