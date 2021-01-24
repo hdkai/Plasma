@@ -36,8 +36,10 @@ def exposure (input: Tensor, weight: Tensor) -> Tensor:
         Tensor: Filtered image with shape (N,3,H,W) in range [-1., 1.].
     """
     _, channels, width, height = input.shape
+    input = (input + 1.) / 2.
     result = (weight + 1.) * input.flatten(start_dim=1)
-    result = result.view(-1, channels, width, height) - 1.
+    result = result.view(-1, channels, width, height)
+    result =  2. * result - 1.
     result = result.clamp(min=-1., max=1.)
     return result
 
@@ -55,8 +57,8 @@ def saturation (input: Tensor, weight: Tensor) -> Tensor:
     _, _, height, width = input.shape
     yuv = rgb_to_yuv(input)
     y, u, v = yuv.split(1, dim=1)
-    u = u.flatten(start_dim=1) * (weight + 1.)
-    v = v.flatten(start_dim=1) * (weight + 1.)
+    u = (weight + 1.) * u.flatten(start_dim=1)
+    v = (weight + 1.) * v.flatten(start_dim=1)
     u = u.view(-1, 1, height, width)
     v = v.view(-1, 1, height, width)
     y = y.expand_as(u)
@@ -79,8 +81,8 @@ def color_balance (input: Tensor, weight: Tensor) -> Tensor:
     yuv = rgb_to_yuv(input)
     y, u, v = yuv.split(1, dim=1)
     temp, tint = weight.split(1, dim=1)
-    u = u.flatten(start_dim=1) + 0.1 * (tint - temp)
-    v = v.flatten(start_dim=1) + 0.1 * (tint + temp)
+    u = 0.1 * (tint - temp) + u.flatten(start_dim=1)
+    v = 0.1 * (tint + temp) + v.flatten(start_dim=1)
     u = u.view(-1, 1, height, width)
     v = v.view(-1, 1, height, width)
     y = y.expand_as(u)
