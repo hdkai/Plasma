@@ -7,8 +7,8 @@ from pytest import fixture, mark
 from torch import cat, linspace, tensor, zeros, zeros_like
 from .common import tensorread, tensorwrite
 
-from plasma.conversion import rgb_to_xyz, xyz_to_lab, lab_to_xyz, xyz_to_rgb, srgb_to_linear, linear_to_srgb
-from plasma.linear import color_balance
+from torchplasma.conversion import rgb_to_xyz, xyz_to_lab, lab_to_xyz, xyz_to_rgb, srgb_to_linear, linear_to_srgb
+from torchplasma.linear import color_balance
 
 IMAGE_PATHS = [
     "test/media/conversion/input.jpg",

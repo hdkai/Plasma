@@ -10,7 +10,7 @@ with open("README.md", "r") as readme:
     long_description = readme.read()
 
 # Get version
-with open("plasma/version.py") as version_source:
+with open("torchplasma/version.py") as version_source:
     gvars = {}
     exec(version_source.read(), gvars)
     version = gvars["__version__"]
@@ -32,7 +32,7 @@ setup(
         "torchvision"
     ],
     url="https://github.com/hdkai/Plasma",
-    packages=find_packages(include=["plasma", "plasma.*"]),
+    packages=find_packages(include=["torchplasma", "torchplasma.*"]),
     package_data={ },
     classifiers=[
         "Programming Language :: Python :: 3",

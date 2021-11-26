@@ -8,7 +8,7 @@ from numpy import linspace, tile, uint16
 from pytest import fixture, mark
 from .common import tensorread, tensorwrite
 
-from plasma.curves import discrete_curve_1d, discrete_curve_3d, cuberead, lutread
+from torchplasma.curves import discrete_curve_1d, discrete_curve_3d, cuberead, lutread
 
 IMAGE_PATHS = [
     "test/media/filter/1.jpg",

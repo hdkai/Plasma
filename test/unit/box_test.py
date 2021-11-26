@@ -7,7 +7,7 @@ from pytest import fixture, mark
 from torch import zeros, zeros_like
 from .common import tensorread, tensorwrite
 
-from plasma.filters import box_filter
+from torchplasma.filters import box_filter
 
 IMAGE_PATHS = [
     "test/media/filter/1.jpg",

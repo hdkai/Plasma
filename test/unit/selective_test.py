@@ -7,8 +7,8 @@ from pytest import fixture, mark
 from torch import cat, linspace, stack, tensor, zeros, zeros_like
 from .common import tensorread, tensorwrite
 
-from plasma.linear import selective_color
-import plasma.linear.selective as selective
+from torchplasma.linear import selective_color
+import torchplasma.linear.selective as selective
 
 IMAGE_PATHS = [
     "test/media/filter/1.jpg",

@@ -8,7 +8,7 @@ from pytest import fixture, mark
 from torch import float32, tensor
 from .common import tensorread, tensorwrite
 
-from plasma.curves import natural_cubic_curve
+from torchplasma.curves import natural_cubic_curve
 
 IMAGE_PATHS = [
     "test/media/filter/1.jpg",

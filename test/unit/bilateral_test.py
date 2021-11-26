@@ -7,8 +7,8 @@ from pytest import fixture, mark
 from torch import cat, isnan, linspace, zeros, zeros_like
 from .common import tensorread, tensorwrite
 
-from plasma.conversion import rgb_to_luminance, rgb_to_yuv, yuv_to_rgb
-from plasma.filters import bilateral_filter, slice_bilateral_grid
+from torchplasma.conversion import rgb_to_luminance, rgb_to_yuv, yuv_to_rgb
+from torchplasma.filters import bilateral_filter, slice_bilateral_grid
 
 IMAGE_PATHS = [
     "test/media/filter/1.jpg",

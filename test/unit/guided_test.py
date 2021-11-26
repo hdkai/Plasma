@@ -8,8 +8,8 @@ from torch import cat, linspace, zeros, zeros_like
 from torch.nn.functional import interpolate
 from .common import tensorread, tensorwrite
 
-from plasma.conversion import rgb_to_luminance, rgb_to_yuv, yuv_to_rgb
-from plasma.filters import guided_filter
+from torchplasma.conversion import rgb_to_luminance, rgb_to_yuv, yuv_to_rgb
+from torchplasma.filters import guided_filter
 
 IMAGE_PATHS = [
     "test/media/filter/1.jpg",

@@ -6,7 +6,7 @@
 from pytest import fixture, mark
 from .common import tensorread, tensorwrite
 
-from plasma.blending import blend_overlay, blend_soft_light
+from torchplasma.blending import blend_overlay, blend_soft_light
 
 IMAGE_PAIRS = [
     ("", "")

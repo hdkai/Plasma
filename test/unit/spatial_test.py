@@ -7,7 +7,7 @@ from pytest import fixture, mark
 from torch import cat, linspace, zeros_like
 from .common import tensorread, tensorwrite
 
-from plasma.spatial import color_balance, contrast, exposure, saturation
+from torchplasma.spatial import color_balance, contrast, exposure, saturation
 
 IMAGE_PATHS = [
     "test/media/filter/1.jpg",
