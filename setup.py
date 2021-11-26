@@ -1,6 +1,6 @@
 # 
 #   Plasma
-#   Copyright (c) 2021 Homedeck, LLC.
+#   Copyright (c) 2021 Yusuf Olokoba.
 #
 
 from setuptools import find_packages, setup
@@ -17,11 +17,11 @@ with open("plasma/version.py") as version_source:
 
 # Setup
 setup(
-    name="plasma",
+    name="torchplasma",
     version=version,
-    author="Homedeck, LLC.",
+    author="Yusuf Olokoba",
     author_email="hi@hdk.ai",
-    description="Differentiable image editing framework.",
+    description="Differentiable image editing operations for computational photography in PyTorch.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="Apache License 2.0",

@@ -1,6 +1,6 @@
 # 
 #   Plasma
-#   Copyright (c) 2021 Homedeck, LLC.
+#   Copyright (c) 2021 Yusuf Olokoba.
 #
 
 from numpy import linspace

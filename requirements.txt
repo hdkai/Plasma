@@ -1,7 +1,5 @@
 imageio
-matplotlib
 numpy
 pillow
-tableprint
 torch
 torchvision

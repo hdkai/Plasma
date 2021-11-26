@@ -1,2 +1,2 @@
-## Plasma 0.0.x
-+ Pre-release.
+## Plasma 0.0.1
++ First pre-release.
